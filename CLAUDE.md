@@ -79,12 +79,13 @@ npx agentage extension down                     # removes this working copy's co
 
 ## 5. Release
 
-- This repo has no release workflow. Copy `.github/workflows/release.yml` and
-  `scripts/release-guard.sh` from agentage/extension-probe before your first release.
-- A `v{version}` tag equal to the `package.json` version runs the release. It pushes
-  `ghcr.io/agentage/{id}-{part}:{version}`, attaches `agentage-extension.json` (the images by
-  digest) to the GitHub release and publishes the npm package with provenance.
-- A version never changes. A fix is a new version. Never move a `v*` tag.
+- Set the version in `package.json` on master. Push the tag `v{version}` on that commit.
+- `.github/workflows/release.yml` then pushes `ghcr.io/agentage/{id}-{part}:{version}`, attaches
+  `agentage-extension.json` (the images by digest) to the GitHub release and publishes the npm
+  package with provenance. The first publish of a new npm name waits for the owner's approval.
+- `scripts/release-guard.sh` keeps a released version: a re-run only retries npm, a moved tag is
+  refused. A fix is a new version. Never move a `v*` tag.
+- The first release step stops the starting point itself. It passes for every other id.
 
 ## 6. The estate row
 
@@ -106,7 +107,6 @@ These touches are outside this repo. Each is one small PR or one owner action.
 - Read a red run on the Actions tab of agentage/estate. The run names the part and the check.
 - A part's logs are JSON lines with the `agcid` of the request. Search for it.
 - To change what runs, release a new version and change the version in the estate row.
-- Dependabot opens one group PR every Friday. Merge it when CI is green.
 
 ## 8. What the platform promises
 
@@ -116,4 +116,4 @@ These touches are outside this repo. Each is one small PR or one owner action.
   No route reaches a part's `/health`.
 - The estate runs the migrations as a job before the rollout. A release never restarts the store.
 - The same smoke and contract gate runs for every extension in the e2e registry.
-- A kit minor reaches this repo through the Friday Dependabot group, never by surprise.
+- A kit minor reaches this repo through the Friday Dependabot group PR. Merge it when CI is green.
