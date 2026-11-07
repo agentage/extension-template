@@ -38,6 +38,7 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - `create` deletes the folders of the parts you do not keep. It writes your id into every file.
 - Push to a new public repo `agentage/extension-<id>`, default branch `master`.
 - Without api, delete `openapi.json`. Without mcp, delete `<id>.mcpc.json`.
+- Edit the parts table of section 1 and the README to the parts you kept.
 
 ## 3. Write parts
 
@@ -72,7 +73,7 @@ npx agentage extension down                     # removes this working copy's co
 
 - `up` builds the images with the release recipe. It starts postgres, runs the migrations, a dev
   issuer on 4281 and a gateway on 4280 with the URL layout of `next`.
-- `up` writes `.agentage/` (ignored). `build` needs a commit: commit first.
+- `up` writes `.agentage/` (ignored). From cli 0.43, `build` needs a commit.
 - CI runs the same steps, then the e2e gate on local: `npm run e2e -- template gate local` in
   agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
 
@@ -96,8 +97,7 @@ These touches are outside this repo. Each is one small PR or one owner action.
 | the `GATE_TOKENS` secret (owner)      | a `"{id}"` entry: the bearer your gate sends on `next`       |
 | agentage/auth `pat-scopes.ts` (owner) | the id in `EXTENSION_IDS`, only when you declare a scope     |
 
-- The pools in the row are `web` for pages and ui, `api` for api, mcp and worker, `data` for store.
-- The host is `{id}.next.agentage.io`.
+- Pools: `web` for pages and ui, `api` for api, mcp and worker, `data` for store. Host: `{id}.next.agentage.io`.
 
 ## 7. Operate
 
