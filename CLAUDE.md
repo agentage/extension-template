@@ -15,15 +15,15 @@ and [`@agentage/widget`](https://www.npmjs.com/package/@agentage/widget).
   pool, the scheduler and the command line. You write only the part code.
 - There is no Dockerfile and no compose file. The kit builds one image for each part.
 
-| Part   | Folder                  | What it does here                                                   |
-| ------ | ----------------------- | ------------------------------------------------------------------- |
-| pages  | `src/pages`             | `/` shows `{id} {version} · {commit}`                               |
-| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`         |
-| api    | `src/api`               | `GET /api/v1/echo?msg=` (scope `template:read`), `GET /api/v1/ping` |
-| mcp    | `src/mcp`               | the tool `template__echo` (scope `template:read`) on `POST /mcp`    |
-| worker | `src/worker`            | the job `tick`, every minute; it logs `tick` and uses no store      |
-| store  | `migrations/`, `seeds/` | postgres; `GET /api/v1/ping` counts its `pings` rows                |
-| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                                 |
+| Part   | Folder                  | What it does here                                               |
+| ------ | ----------------------- | --------------------------------------------------------------- |
+| pages  | `src/pages`             | `/` shows `{id} {version} · {commit}`                           |
+| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`     |
+| api    | `src/api`               | `GET /api/v1/echo?msg=` (scope `{id}:read`), `GET /api/v1/ping` |
+| mcp    | `src/mcp`               | the tool `{id}__echo` (scope `{id}:read`) on `POST /mcp`        |
+| worker | `src/worker`            | the job `tick`, every minute; it logs `tick` and uses no store  |
+| store  | `migrations/`, `seeds/` | postgres; `GET /api/v1/ping` counts its `pings` rows            |
+| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                             |
 
 ## 2. Start
 
