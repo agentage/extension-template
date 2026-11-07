@@ -7,13 +7,11 @@ and [`@agentage/widget`](https://www.npmjs.com/package/@agentage/widget).
 
 ## 1. What an extension is
 
-- An extension is one npm package. The `agentage` block of `package.json` is its manifest.
-- The manifest names the id, the parts, the commands, the settings and the secrets.
-- A part is one folder in `src/`. Each part exports `create(ctx)` and nothing else.
-- The ui part exports `widgets` only.
+- An extension is one npm package. The `agentage` block of `package.json` is its manifest: the
+  id, the parts, the commands, the settings and the secrets.
+- A part is one folder in `src/`. Each exports `create(ctx)` only; the ui part exports `widgets`.
 - The kit owns the server, the port, `/health`, discovery, the envelope, the `agcid`, the store
-  pool, the scheduler and the command line. You write only the part code.
-- There is no Dockerfile and no compose file. The kit builds one image for each part.
+  pool, the scheduler, the command line and one image for each part. You write only the part code.
 
 | Part   | Folder                  | What it does here                                               |
 | ------ | ----------------------- | --------------------------------------------------------------- |
@@ -38,7 +36,8 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - `create` deletes the folders of the parts you do not keep. It writes your id into every file.
 - Push to a new public repo `agentage/extension-<id>`, default branch `master`.
 - Without api, delete `openapi.json`. Without mcp, delete `<id>.mcpc.json`.
-- Edit the parts table of section 1 and the README to the parts you kept.
+- Edit to the parts you kept: the table of section 1, the README, `description` in `package.json`
+  and `MIN_EXECUTED` in `ci.yml` (the gate's floor: 25 fits all seven parts).
 
 ## 3. Write parts
 
@@ -82,7 +81,8 @@ npx agentage extension down                     # removes this working copy's co
 - Set the version in `package.json` on master. Push the tag `v{version}` on that commit.
 - `.github/workflows/release.yml` then pushes `ghcr.io/agentage/{id}-{part}:{version}`, attaches
   `agentage-extension.json` (the images by digest) to the GitHub release and publishes the npm
-  package with provenance. The first publish of a new npm name waits for the owner's approval.
+  package with provenance. The first publish of a new npm name waits for the owner's approval;
+  then add the trusted publisher (this `release.yml`) on npmjs.com, so OIDC takes over.
 - `scripts/release-guard.sh` keeps a released version: a re-run only retries npm, a moved tag is
   refused. A fix is a new version. Never move a `v*` tag.
 - The first release step stops the starting point itself. It passes for every other id.
@@ -91,12 +91,12 @@ npx agentage extension down                     # removes this working copy's co
 
 These touches are outside this repo. Each is one small PR or one owner action.
 
-| Where                                 | What                                                         |
-| ------------------------------------- | ------------------------------------------------------------ |
-| agentage/estate `estate.yaml`         | `extensions.{id}: { version, parts: { api: api, ... } }`     |
-| agentage/e2e `extensions.json`        | `{ "id": "{id}", "token": "GATE_TOKENS", "targets": [...] }` |
-| the `GATE_TOKENS` secret (owner)      | a `"{id}"` entry: the bearer your gate sends on `next`       |
-| agentage/auth `pat-scopes.ts` (owner) | the id in `EXTENSION_IDS`, only when you declare a scope     |
+| Where                                 | What                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------ |
+| agentage/estate `estate.yaml`         | `extensions.{id}: { version, parts: { api: api, ... } }`                 |
+| agentage/e2e `extensions.json`        | `{ "id": "{id}", "token": "GATE_TOKENS", "targets": ["local", "next"] }` |
+| the `GATE_TOKENS` secret (owner)      | a `"{id}"` entry: the bearer your gate sends on `next`                   |
+| agentage/auth `pat-scopes.ts` (owner) | the id in `EXTENSION_IDS`: echo declares `{id}:read`, so it is needed    |
 
 - Pools: `web` for pages and ui, `api` for api, mcp and worker, `data` for store. Host: `{id}.next.agentage.io`.
 
@@ -105,7 +105,7 @@ These touches are outside this repo. Each is one small PR or one owner action.
 - A merge to estate master deploys `next`. The deploy applies the stacks, checks each part's
   `/health`, then runs your gate: `npm run e2e -- {id} gate next`.
 - Read a red run on the Actions tab of agentage/estate. The run names the part and the check.
-- A part's logs are JSON lines with the `agcid` of the request. Search for it.
+  A part logs JSON lines with the request's `agcid`: search for it.
 - To change what runs, release a new version and change the version in the estate row.
 
 ## 8. What the platform promises

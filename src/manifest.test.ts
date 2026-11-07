@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 const SRC = new URL('.', import.meta.url);
 const pkg = JSON.parse(readFileSync(new URL('../package.json', SRC), 'utf8')) as {
   exports: Record<string, unknown>;
+  agentage: { id: string };
 };
 const IMAGES = ['pages', 'ui', 'api', 'mcp', 'worker'];
 const has = (path: string) => existsSync(new URL(path, SRC));
@@ -36,6 +37,13 @@ describe('the manifest', () => {
 
   it.runIf(has('ui'))('ui exports its widgets map', async () => {
     expect(Object.keys((await import(UI)) as object)).toEqual(['widgets']);
+  });
+
+  it('commits a contract only beside its part', () => {
+    expect([has('../openapi.json'), has(`../${pkg.agentage.id}.mcpc.json`)]).toEqual([
+      has('api'),
+      has('mcp'),
+    ]);
   });
 
   it('the package exports no part code', () => {

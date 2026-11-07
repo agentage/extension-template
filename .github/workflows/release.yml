@@ -99,7 +99,7 @@ jobs:
 
       - name: Publish to npm (skips a version already published)
         env:
-          # TEMPORARY: stages the first publish of a new name; delete once @agentage/widget is on npm
+          # A new npm name has no trusted publisher: its first publish is staged
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
