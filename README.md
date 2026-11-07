@@ -8,6 +8,7 @@ new extension from it, keep the parts you need, and ship it to `next` in one day
 ```bash
 agentage extension create <id> [part...]   # no part = all seven
 cd extension-<id> && npm ci && npm run build && agentage extension check
+npm run verify                             # type-check, lint, format, tests, build
 ```
 
 ## The one page
