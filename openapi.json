@@ -15,7 +15,7 @@
   "paths": {
     "/api/v1/echo": {
       "get": {
-        "operationId": "echo",
+        "summary": "Echo msg",
         "security": [
           {
             "pat": ["template:read"]
@@ -55,14 +55,8 @@
                           "type": "string"
                         }
                       },
-                      "required": ["msg", "caller"]
-                    },
-                    "meta": {
-                      "type": "object",
-                      "propertyNames": {
-                        "type": "string"
-                      },
-                      "additionalProperties": {}
+                      "required": ["msg", "caller"],
+                      "additionalProperties": false
                     }
                   },
                   "required": ["success", "data"]
@@ -139,7 +133,7 @@
     },
     "/api/v1/ping": {
       "get": {
-        "operationId": "ping",
+        "summary": "Answer pong",
         "security": [],
         "responses": {
           "200": {
@@ -172,14 +166,8 @@
                           ]
                         }
                       },
-                      "required": ["msg", "pings"]
-                    },
-                    "meta": {
-                      "type": "object",
-                      "propertyNames": {
-                        "type": "string"
-                      },
-                      "additionalProperties": {}
+                      "required": ["msg", "pings"],
+                      "additionalProperties": false
                     }
                   },
                   "required": ["success", "data"]

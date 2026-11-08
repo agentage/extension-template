@@ -1,19 +1,14 @@
-import { readFileSync } from 'node:fs';
 import { createTestContext, startTestMcp } from '@agentage/extension';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { create } from './index.js';
 
-const { version, agentage } = JSON.parse(
-  readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
-) as { version: string; agentage: { id: string } };
-const { id } = agentage;
 let server: Awaited<ReturnType<typeof startTestMcp>>;
 beforeAll(async () => {
-  server = await startTestMcp({ create, ctx: createTestContext({ extension: { id, version } }) });
+  server = await startTestMcp({ create, ctx: createTestContext() });
 });
 afterAll(() => server.close());
 
-describe(`${id}__echo`, () => {
+describe('template__echo', () => {
   it('declares scope read', () => {
     const ctx = createTestContext();
     create(ctx);
