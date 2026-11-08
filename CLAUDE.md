@@ -54,6 +54,7 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - store: add a numbered file in `migrations/`. Never edit a migration that ran.
 - `openapi.json` and `template.mcpc.json` are committed contracts. `check` compares them to the code.
   `npx agentage extension check --write` writes them again, then `npm run format`.
+  For `openapi.json` it only sets `info.version`: edit routes by hand, `openapi.test.ts` asserts them.
 
 ## 4. The loop on a laptop
 
@@ -79,11 +80,12 @@ npx agentage extension down                     # removes this working copy's co
 
 - Bump the version in `package.json`, run `npx agentage extension check --write`, commit, and
   push the tag `v{version}` on that commit on master.
-- `release.yml` (`agentage extension release`) then pushes the part images, attaches `agentage-extension.json` to the GitHub
-  release and publishes to npm. The first publish of a new npm name waits for the owner's
-  approval; then add `release.yml` as the trusted publisher on npmjs.com.
+- `release.yml` (`agentage extension release`) then pushes the part images, attaches
+  `agentage-extension.json` to the GitHub release and publishes to npm. The first publish of a
+  new npm name waits for the owner's approval; then add `release.yml` as the trusted publisher
+  on npmjs.com.
 - A re-run only retries npm; a moved tag is refused. A fix is a new version. Never move a `v*` tag.
-- The first release step stops the starting point itself. It passes for every other id.
+- `agentage extension release` refuses the id `template` (this starting point). It passes for every other id.
 
 ## 6. The estate row
 
