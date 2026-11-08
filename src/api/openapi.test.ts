@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { ErrorEnvelopeSchema } from '@agentage/extension';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
@@ -76,8 +76,6 @@ const generated = () => ({
 
 describe('openapi.json', () => {
   it('equals what the Zod schemas generate', () => {
-    if (process.env['UPDATE_SNAPSHOT'])
-      writeFileSync(FILE, `${JSON.stringify(generated(), null, 2)}\n`);
     expect(JSON.parse(readFileSync(FILE, 'utf8'))).toEqual(generated());
   });
 });

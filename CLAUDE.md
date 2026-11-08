@@ -47,13 +47,14 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - Each part has its tests beside it in `src/{part}/`. One part can go without breaking another.
 - Test only the lines you wrote: `check` and the kit's own tests cover the rest.
 - api: validate every query and body with Zod (`parse`). Answer with `ok(...)`.
-- api: give each route a scope in `src/api/openapi.test.ts`, which writes `openapi.json`:
+- api: give each route a scope in `src/api/openapi.test.ts`, which `openapi.json` must equal:
   `security: [{ pat: ['template:read'] }]`, or `security: []` for an anonymous route.
 - mcp: give each tool a `scope` beside its schemas. The kit names it `{id}__{name}`.
-- The api reads `parts.store` from `package.json`. Without a store, `/ping` does not query.
+- The api reads `ctx.extension.store`. Without a store, `/ping` does not query.
 - store: add a numbered file in `migrations/`. Never edit a migration that ran.
-- `openapi.json` and `template.mcpc.json` are committed contracts. Tests compare them to the code.
-  `UPDATE_SNAPSHOT=1 npm test` writes both again. A version bump changes both.
+- `openapi.json` and `template.mcpc.json` are committed contracts. `check` compares them to the code.
+  `npx agentage extension check --write` writes them again, then `npm run format`.
+  For `openapi.json` it only sets `info.version`: edit routes by hand, `openapi.test.ts` asserts them.
 
 ## 4. The loop on a laptop
 
@@ -62,8 +63,7 @@ You need Node 22+, npm 10+, Docker, `git` and `jq`.
 ```bash
 npm run verify                                  # type-check, lint, format, tests, build
 npx agentage extension check                    # PASS {id} {version} conforms (6 rules)
-npx agentage extension up                       # ready    N parts healthy    <n> s
-scripts/image-smoke.sh "$(git rev-parse HEAD)"  # PASS for each part image
+npx agentage extension up                       # ready    N parts healthy    <n> s (each /health body checked)
 npm run test:e2e                                # the widget in a browser, axe WCAG A/AA
 T=$(npx agentage extension token --scope template:read)
 curl -s -H "Authorization: Bearer $T" "localhost:4280/api/v1/echo?msg=hi"
@@ -78,12 +78,14 @@ npx agentage extension down                     # removes this working copy's co
 
 ## 5. Release
 
-- Set the version in `package.json` on master. Push the tag `v{version}` on that commit.
-- `release.yml` then pushes the part images, attaches `agentage-extension.json` to the GitHub
-  release and publishes to npm. The first publish of a new npm name waits for the owner's
-  approval; then add `release.yml` as the trusted publisher on npmjs.com.
+- Bump the version in `package.json`, run `npx agentage extension check --write`, commit, and
+  push the tag `v{version}` on that commit on master.
+- `release.yml` (`agentage extension release`) then pushes the part images, attaches
+  `agentage-extension.json` to the GitHub release and publishes to npm. The first publish of a
+  new npm name waits for the owner's approval; then add `release.yml` as the trusted publisher
+  on npmjs.com.
 - A re-run only retries npm; a moved tag is refused. A fix is a new version. Never move a `v*` tag.
-- The first release step stops the starting point itself. It passes for every other id.
+- `agentage extension release` refuses the id `template` (this starting point). It passes for every other id.
 
 ## 6. The estate row
 

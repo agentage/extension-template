@@ -1,4 +1,3 @@
-import type fs from 'node:fs';
 import { readFileSync } from 'node:fs';
 import {
   createTestContext,
@@ -7,7 +6,7 @@ import {
   type PartContext,
   type Store,
 } from '@agentage/extension';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { create } from './index.js';
 
 const { agentage } = JSON.parse(
@@ -40,16 +39,8 @@ describe('GET /api/v1/echo', () => {
   });
 });
 
-// The api reads parts.store from package.json at import: each manifest gets a fresh module.
-const ping = async (parts: object, ctx: PartContext = createTestContext()) => {
-  vi.resetModules();
-  vi.doMock('node:fs', async (real) => ({
-    ...(await real<typeof fs>()),
-    readFileSync: () => JSON.stringify({ agentage: { parts } }),
-  }));
-  const api = await import('./index.js');
-  vi.doUnmock('node:fs');
-  const one = await startTestServer({ create: api.create, ctx });
+const ping = async (ctx: PartContext) => {
+  const one = await startTestServer({ create, ctx });
   const body: unknown = await (await one.fetch('/api/v1/ping')).json();
   await one.close();
   return body;
@@ -58,12 +49,13 @@ const ping = async (parts: object, ctx: PartContext = createTestContext()) => {
 describe('GET /api/v1/ping', () => {
   it('counts the rows of pings when the manifest keeps the store', async () => {
     const counted = { query: async () => ({ rows: [{ n: 3 }] }) } as Store;
-    const body = await ping({ store: 'postgres' }, { ...createTestContext(), store: counted });
+    const ctx = createTestContext({ extension: { store: 'postgres' } });
+    const body = await ping({ ...ctx, store: counted });
     expect(body).toEqual(ok({ msg: 'pong', pings: 3 }));
   });
 
   it('answers pings null without a store', async () => {
-    expect(await ping({})).toEqual(ok({ msg: 'pong', pings: null }));
+    expect(await ping(createTestContext())).toEqual(ok({ msg: 'pong', pings: null }));
   });
 
   it.runIf(store)('counts the seeded row: the migration and the seed ran', async () => {
