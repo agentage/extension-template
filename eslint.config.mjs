@@ -8,17 +8,13 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   {
-    ignores: ['dist/**', 'coverage/**', 'node_modules/**', 'test-results/**'],
+    ignores: ['dist/**', 'coverage/**', 'test-results/**'],
   },
   {
     files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts', '*.ts'],
     languageOptions: {
       parser: tsParser,
-      parserOptions: {
-        ecmaVersion: 2024,
-        sourceType: 'module',
-        project: ['./tsconfig.eslint.json'],
-      },
+      parserOptions: { project: './tsconfig.eslint.json' },
     },
     plugins: {
       '@typescript-eslint': typescriptEslint,

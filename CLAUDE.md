@@ -10,8 +10,8 @@ and [`@agentage/widget`](https://www.npmjs.com/package/@agentage/widget).
 - An extension is one npm package. The `agentage` block of `package.json` is its manifest: the
   id, the parts, the commands, the settings and the secrets.
 - A part is one folder in `src/`. Each exports `create(ctx)` only; the ui part exports `widgets`.
-- The kit owns the server, the port, `/health`, discovery, the envelope, the `agcid`, the store
-  pool, the scheduler, the command line and one image for each part. You write only the part code.
+- The kit owns the server, `/health`, auth, the store pool, the scheduler and the images. You
+  write only the part code.
 
 | Part   | Folder                  | What it does here                                               |
 | ------ | ----------------------- | --------------------------------------------------------------- |
@@ -33,9 +33,8 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 
 - The id has lowercase letters, digits and `-`. It starts with a letter. It is not a part name.
 - Keep at least one of pages, ui, api or mcp.
-- `create` deletes the folders of the parts you do not keep. It writes your id into every file.
+- `create` deletes the folders and contracts of the parts you do not keep. It writes your id into every file.
 - Push to a new public repo `agentage/extension-<id>`, default branch `master`.
-- Without api, delete `openapi.json`. Without mcp, delete `<id>.mcpc.json`.
 - Edit to the parts you kept: the table of section 1, the README, `description` in `package.json`
   and `MIN_EXECUTED` in `ci.yml` (the gate's floor: 25 fits all seven parts).
 
@@ -46,6 +45,7 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - Put code in `src/lib/` only when every kept part can use it.
 - Never use `listen()`, the `process` global, a token check or an absolute agentage URL in `src/`.
 - Each part has its tests beside it in `src/{part}/`. One part can go without breaking another.
+- Test only the lines you wrote: `check` and the kit's own tests cover the rest.
 - api: validate every query and body with Zod (`parse`). Answer with `ok(...)`.
 - api: give each route a scope in `src/api/openapi.test.ts`, which writes `openapi.json`:
   `security: [{ pat: ['template:read'] }]`, or `security: []` for an anonymous route.
@@ -70,8 +70,8 @@ curl -s -H "Authorization: Bearer $T" "localhost:4280/api/v1/echo?msg=hi"
 npx agentage extension down                     # removes this working copy's containers
 ```
 
-- `up` builds the images with the release recipe. It starts postgres, runs the migrations, a dev
-  issuer on 4281 and a gateway on 4280 with the URL layout of `next`.
+- `up` runs the release images, postgres with your migrations, a dev issuer (4281) and a gateway
+  (4280) laid out like `next`.
 - `up` writes `.agentage/` (ignored). From cli 0.43, `build` needs a commit.
 - CI runs the same steps, then the e2e gate on local: `npm run e2e -- template gate local` in
   agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
@@ -79,12 +79,10 @@ npx agentage extension down                     # removes this working copy's co
 ## 5. Release
 
 - Set the version in `package.json` on master. Push the tag `v{version}` on that commit.
-- `.github/workflows/release.yml` then pushes `ghcr.io/agentage/{id}-{part}:{version}`, attaches
-  `agentage-extension.json` (the images by digest) to the GitHub release and publishes the npm
-  package with provenance. The first publish of a new npm name waits for the owner's approval;
-  then add the trusted publisher (this `release.yml`) on npmjs.com, so OIDC takes over.
-- `scripts/release-guard.sh` keeps a released version: a re-run only retries npm, a moved tag is
-  refused. A fix is a new version. Never move a `v*` tag.
+- `release.yml` then pushes the part images, attaches `agentage-extension.json` to the GitHub
+  release and publishes to npm. The first publish of a new npm name waits for the owner's
+  approval; then add `release.yml` as the trusted publisher on npmjs.com.
+- A re-run only retries npm; a moved tag is refused. A fix is a new version. Never move a `v*` tag.
 - The first release step stops the starting point itself. It passes for every other id.
 
 ## 6. The estate row
@@ -111,9 +109,7 @@ These touches are outside this repo. Each is one small PR or one owner action.
 ## 8. What the platform promises
 
 - The kit checks the token and the declared scope before your route or tool runs.
-- The kit answers `/health`, discovery and errors in the envelope with an `agcid`.
 - The gateway serves `/`, `/ui/{version}/`, `/api/v1/` and `/mcp`. It drops the `Cookie` header.
-  No route reaches a part's `/health`.
 - The estate runs the migrations as a job before the rollout. A release never restarts the store.
 - The same smoke and contract gate runs for every extension in the e2e registry.
 - A kit minor reaches this repo through the Friday Dependabot group PR. Merge it when CI is green.

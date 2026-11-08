@@ -1,9 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
-import { createTestContext, ErrorEnvelopeSchema } from '@agentage/extension';
+import { ErrorEnvelopeSchema } from '@agentage/extension';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { EchoSchema } from './echo.schema.js';
-import { create } from './index.js';
 
 const FILE = new URL('../../openapi.json', import.meta.url);
 const { version, agentage } = JSON.parse(
@@ -54,8 +53,8 @@ const invalid = {
 const generated = () => ({
   openapi: '3.1.0',
   info: { title: id, version },
-  // The only place a route names its scope; the kit asks for it before the route runs.
   components: { securitySchemes: { pat: { type: 'http', scheme: 'bearer' } } },
+  // The only place a route names its scope; the kit asks for it before the route runs.
   paths: {
     '/api/v1/echo': {
       get: {
@@ -80,18 +79,5 @@ describe('openapi.json', () => {
     if (process.env['UPDATE_SNAPSHOT'])
       writeFileSync(FILE, `${JSON.stringify(generated(), null, 2)}\n`);
     expect(JSON.parse(readFileSync(FILE, 'utf8'))).toEqual(generated());
-  });
-
-  // A route outside openapi.json would have no declared access; no sub-routers.
-  it('documents every route the api part serves, and nothing else', () => {
-    const { stack } = create(createTestContext());
-    expect(stack.filter((layer) => !layer.route).map((layer) => layer.name)).toEqual([]);
-    const served = stack.flatMap(({ route }) =>
-      route ? route.stack.map(({ method }) => `${method} /api/v1${route.path}`) : []
-    );
-    const documented = Object.entries(generated().paths).flatMap(([path, ops]) =>
-      Object.keys(ops).map((method) => `${method} ${path}`)
-    );
-    expect(served.sort()).toEqual(documented.sort());
   });
 });

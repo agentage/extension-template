@@ -73,7 +73,7 @@
     "zod": "^4.2.0"
   },
   "devDependencies": {
-    "@agentage/cli": "0.42.1",
+    "@agentage/cli": "0.44.0",
     "@agentage/widget": "^0.1.1",
     "@axe-core/playwright": "4.14.0",
     "@electric-sql/pglite": "0.5.15",

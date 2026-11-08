@@ -1,4 +1,5 @@
-import { versionPage, type PagesContext, type PagesSite } from '@agentage/extension';
+import { versionPage, type PagesContext } from '@agentage/extension';
 
-// The kit serves this map; "/" names what runs: {id} {version} · {commit}.
-export const create = (ctx: PagesContext): PagesSite => ({ '/': versionPage(ctx) });
+export function create(ctx: PagesContext) {
+  return { '/': versionPage(ctx) };
+}
