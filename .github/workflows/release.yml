@@ -1,6 +1,6 @@
 name: Release
 
-# A v* tag: agentage extension release refuses the template, a commit off master and a tag that is
+# A v* tag: agentage extension release refuses the starting-point id, a commit off master and a tag that is
 # not the version, keeps a released version (re-run = npm only), then pushes the images, attaches
 # agentage-extension.json to the release and publishes to npm with OIDC (npm = this file).
 on:

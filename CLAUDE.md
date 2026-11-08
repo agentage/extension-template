@@ -86,7 +86,7 @@ npx agentage extension down                     # removes this working copy's co
   new npm name waits for the owner's approval; then add `release.yml` as the trusted publisher
   on npmjs.com.
 - A re-run only retries npm; a moved tag is refused. A fix is a new version. Never move a `v*` tag.
-- `agentage extension release` refuses the id `template` (this starting point). It passes for every other id.
+- `agentage extension release` refuses the id of the repo this one was copied from, and passes for every other id.
 
 ## 6. The estate row
 
