@@ -57,9 +57,9 @@ jobs:
           npm ci
           npx playwright install chromium
 
-      # agentage/e2e is private (the org PAT_TOKEN reads it); Dependabot runs get no secrets.
+      # agentage/e2e is private (the org PAT_TOKEN reads it); Dependabot and fork runs get no secrets.
       - name: Checkout agentage/e2e
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.fork != true
         uses: actions/checkout@v7
         with:
           repository: agentage/e2e
@@ -68,7 +68,7 @@ jobs:
           persist-credentials: false
 
       - name: Install agentage/e2e
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.fork != true
         run: |
           npm ci --prefix e2e-suite --no-audit --no-fund
           npx --prefix e2e-suite playwright install chromium
@@ -85,15 +85,15 @@ jobs:
 
       # {ID}_DIR lets the gate read the contracts from this checkout; the name follows the id.
       - name: e2e gate on local (agentage/e2e, a row in its extensions.json)
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.fork != true
         working-directory: e2e-suite
         run: |
           var="$(jq -r .agentage.id ../package.json | tr a-z- A-Z_)_DIR"
           env "$var=$GITHUB_WORKSPACE" npm run e2e -- template gate local
 
-      # A gate that skipped itself is not green (31 executed on 2026-11-08).
+      # A gate that skipped itself is not green.
       - name: Assert the gate was not vacuous
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.fork != true
         working-directory: e2e-suite
         env:
           MIN_EXECUTED: '25'

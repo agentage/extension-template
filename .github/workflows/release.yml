@@ -95,7 +95,7 @@ jobs:
           fi
 
       - name: Upgrade npm
-        run: npm install -g npm@latest && npm --version # OIDC needs npm >= 11.5.1
+        run: npm install -g npm@11 && npm --version # OIDC needs npm >= 11.5.1
 
       - name: Publish to npm (skips a version already published)
         env:
