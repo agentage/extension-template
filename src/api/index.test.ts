@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import {
   createTestContext,
   ok,
@@ -9,11 +8,8 @@ import {
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { create } from './index.js';
 
-const { agentage } = JSON.parse(
-  readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
-) as { agentage: { parts: { store?: string } } };
-const store = Boolean(agentage.parts.store);
-const ctx = createTestContext({ store });
+const ctx = createTestContext();
+const { store } = ctx.extension;
 let server: Awaited<ReturnType<typeof startTestServer>>;
 // The store boots (WASM, migrations, seed) on first use: here, not inside a test's 5 s.
 beforeAll(async () => {
@@ -55,7 +51,8 @@ describe('GET /api/v1/ping', () => {
   });
 
   it('answers pings null without a store', async () => {
-    expect(await ping(createTestContext())).toEqual(ok({ msg: 'pong', pings: null }));
+    const body = await ping(createTestContext({ store: false }));
+    expect(body).toEqual(ok({ msg: 'pong', pings: null }));
   });
 
   it.runIf(store)('counts the seeded row: the migration and the seed ran', async () => {

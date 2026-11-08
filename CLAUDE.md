@@ -46,15 +46,16 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - Never use `listen()`, the `process` global, a token check or an absolute agentage URL in `src/`.
 - Each part has its tests beside it in `src/{part}/`. One part can go without breaking another.
 - Test only the lines you wrote: `check` and the kit's own tests cover the rest.
-- api: validate every query and body with Zod (`parse`). Answer with `ok(...)`.
-- api: give each route a scope in `src/api/openapi.test.ts`, which `openapi.json` must equal:
-  `security: [{ pat: ['template:read'] }]`, or `security: []` for an anonymous route.
+- api: declare each route with `route(method, path, { summary, scope?, input?, output? }, handler)`.
+  The scope is `read` (the default), `write`, `admin` or `public` (anonymous). `input` is read
+  from the query on get and delete and from the body otherwise: use `z.coerce` for numbers.
+  The handler returns the data; the kit answers `ok(...)`.
 - mcp: give each tool a `scope` beside its schemas. The kit names it `{id}__{name}`.
 - The api reads `ctx.extension.store`. Without a store, `/ping` does not query.
 - store: add a numbered file in `migrations/`. Never edit a migration that ran.
-- `openapi.json` and `template.mcpc.json` are committed contracts. `check` compares them to the code.
-  `npx agentage extension check --write` writes them again, then `npm run format`.
-  For `openapi.json` it only sets `info.version`: edit routes by hand, `openapi.test.ts` asserts them.
+- `openapi.json` and `template.mcpc.json` are committed contracts, generated from the routes and
+  tools. `check` compares them to the code. After a change, run `npm run build`,
+  `npx agentage extension check --write`, then `npm run format`.
 
 ## 4. The loop on a laptop
 
