@@ -11,7 +11,7 @@ export default [
     ignores: ['dist/**', 'coverage/**', 'test-results/**'],
   },
   {
-    files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts', '*.ts'],
+    files: ['src/**/*.{ts,tsx}', '*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: { project: './tsconfig.eslint.json' },

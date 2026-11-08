@@ -3,5 +3,5 @@
   "compilerOptions": {
     "rootDir": "."
   },
-  "include": ["src", "scripts", "vitest.config.ts", "playwright.config.ts"]
+  "include": ["src", "vitest.config.ts", "playwright.config.ts"]
 }
