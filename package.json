@@ -17,7 +17,7 @@
   },
   "engines": {
     "node": ">=22",
-    "agentage": "^0.6"
+    "agentage": "^0.7"
   },
   "agentage": {
     "id": "template",
@@ -68,13 +68,13 @@
     "prepublishOnly": "npm run verify"
   },
   "dependencies": {
-    "@agentage/extension": "0.6.0",
+    "@agentage/extension": "0.7.0",
     "express": "^5.1.0",
     "zod": "^4.2.0"
   },
   "devDependencies": {
     "@agentage/cli": "0.46.0",
-    "@agentage/widget": "^0.1.1",
+    "@agentage/widget": "^0.3.0",
     "@axe-core/playwright": "4.14.0",
     "@electric-sql/pglite": "0.5.15",
     "@playwright/test": "1.64.1",
@@ -103,6 +103,7 @@
   "overrides": {
     "eslint-plugin-jsx-a11y": {
       "eslint": "$eslint"
-    }
+    },
+    "@agentage/extension": "$@agentage/extension"
   }
 }

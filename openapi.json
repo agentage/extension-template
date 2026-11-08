@@ -10,6 +10,65 @@
         "type": "http",
         "scheme": "bearer"
       }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "VALIDATION_ERROR",
+                  "UNAUTHORIZED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "CONFLICT",
+                  "PRECONDITION_FAILED",
+                  "PAYLOAD_TOO_LARGE",
+                  "RATE_LIMITED",
+                  "INTERNAL",
+                  "UNAVAILABLE"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "agcid": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._:-]{8,128}$"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "field": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["field", "message"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": ["code", "message", "agcid"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["success", "error"],
+        "additionalProperties": false
+      }
     }
   },
   "paths": {
@@ -69,61 +128,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "const": false
-                    },
-                    "error": {
-                      "type": "object",
-                      "properties": {
-                        "code": {
-                          "type": "string",
-                          "enum": [
-                            "VALIDATION_ERROR",
-                            "UNAUTHORIZED",
-                            "FORBIDDEN",
-                            "NOT_FOUND",
-                            "CONFLICT",
-                            "PRECONDITION_FAILED",
-                            "PAYLOAD_TOO_LARGE",
-                            "RATE_LIMITED",
-                            "INTERNAL",
-                            "UNAVAILABLE"
-                          ]
-                        },
-                        "message": {
-                          "type": "string",
-                          "minLength": 1
-                        },
-                        "agcid": {
-                          "type": "string",
-                          "pattern": "^[A-Za-z0-9._:-]{8,128}$"
-                        },
-                        "details": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "field": {
-                                "type": "string"
-                              },
-                              "message": {
-                                "type": "string"
-                              }
-                            },
-                            "required": ["field", "message"],
-                            "additionalProperties": false
-                          }
-                        }
-                      },
-                      "required": ["code", "message", "agcid"],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": ["success", "error"],
-                  "additionalProperties": false
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
