@@ -30,7 +30,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci --ignore-scripts && npm run verify
-      - run: npm install -g npm@11 # OIDC needs npm >= 11.5.1
+      - run: npm install -g npm@11.21.2 # OIDC needs npm >= 11.5.1; 11.21.2 published probe 0.5.2
       - env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
