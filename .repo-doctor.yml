@@ -2,7 +2,7 @@
 class: express-service
 waive:
   - id: cicd-no-npm-token
-    reason: 'the first publish of a new npm name is staged with a token until its trusted publisher exists (as extension-probe)'
+    reason: 'for extensions made from this template: their first npm publish is staged with a token until the trusted publisher exists (the template itself never releases: the guard refuses it)'
   - id: rb-published-files
     reason: 'no prepare-release: this repo never bumps; an extension made from it adds one with the release loop'
   - id: obs-kit
