@@ -5,5 +5,5 @@
     "declarationMap": false
   },
   "files": [],
-  "exclude": ["node_modules", "dist", "coverage", "src/**/*.test.ts", "src/ui"]
+  "exclude": ["src/**/*.test.ts", "src/ui"]
 }

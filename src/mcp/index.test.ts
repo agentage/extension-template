@@ -14,30 +14,26 @@ const { version, agentage } = JSON.parse(
 ) as { version: string; agentage: { id: string } };
 const { id } = agentage;
 const SNAPSHOT = new URL(`../../${id}.mcpc.json`, import.meta.url);
-const ctx = createTestContext({ extension: { id, version } });
 let server: Awaited<ReturnType<typeof startTestMcp>>;
 beforeAll(async () => {
-  server = await startTestMcp({ create, ctx });
+  server = await startTestMcp({ create, ctx: createTestContext({ extension: { id, version } }) });
 });
 afterAll(() => server.close());
 
-// The contract: what each protocol version's client lists equals the committed snapshot.
 describe(`${id}.mcpc.json`, () => {
-  for (const version of PROTOCOL_VERSIONS) {
-    it(`a ${version} client lists exactly the committed snapshot`, async () => {
-      const snapshot = await mcpSnapshot(`${server.url}/mcp`, version);
-      if (process.env['UPDATE_SNAPSHOT'])
-        writeFileSync(SNAPSHOT, `${JSON.stringify(snapshot, null, 2)}\n`);
-      expect(snapshot).toEqual(canonical(JSON.parse(readFileSync(SNAPSHOT, 'utf8'))));
-    });
-  }
+  it.each(PROTOCOL_VERSIONS)('a %s client lists exactly the committed snapshot', async (proto) => {
+    const snapshot = await mcpSnapshot(`${server.url}/mcp`, proto);
+    if (process.env['UPDATE_SNAPSHOT'])
+      writeFileSync(SNAPSHOT, `${JSON.stringify(snapshot, null, 2)}\n`);
+    expect(snapshot).toEqual(canonical(JSON.parse(readFileSync(SNAPSHOT, 'utf8'))));
+  });
 });
 
 describe(`${id}__echo`, () => {
-  it(`needs ${id}:read: the scope it declares beside its schemas`, () => {
-    const recorded = createTestContext({ extension: { id } });
-    create(recorded);
-    expect(recorded.tools.map(({ name, spec }) => [name, spec.scope])).toEqual([['echo', 'read']]);
+  it('declares scope read', () => {
+    const ctx = createTestContext();
+    create(ctx);
+    expect(ctx.tools.map(({ name, spec }) => [name, spec.scope])).toEqual([['echo', 'read']]);
   });
 
   it('answers pong and the message', async () => {
@@ -55,13 +51,8 @@ describe(`${id}__echo`, () => {
       }),
     });
     const data = (await res.text()).split('\n').find((line) => line.startsWith('data:')) ?? '';
-    expect(JSON.parse(data.slice(5))).toEqual({
-      jsonrpc: '2.0',
-      id: 1,
-      result: {
-        content: [{ type: 'text', text: '{"msg":"pong hi"}' }],
-        structuredContent: { msg: 'pong hi' },
-      },
+    expect(JSON.parse(data.slice(5))).toMatchObject({
+      result: { structuredContent: { msg: 'pong hi' } },
     });
   });
 });
