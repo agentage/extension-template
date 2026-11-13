@@ -1,9 +1,10 @@
-# CLAUDE.md - the one page
+# CLAUDE.md - rules for changing this extension
 
-Read this page first. It is the only page you need to ship this extension to `next` in one day.
+Humans start at [README.md](README.md): the start steps, running on a laptop, calling it and the
+release. This page is for the agent that changes the code. Do not repeat the README here.
 The deployed proof of the same shape is [agentage/extension-probe](https://github.com/agentage/extension-probe).
-The kit rules are in the READMEs of [`@agentage/extension`](https://www.npmjs.com/package/@agentage/extension)
-and [`@agentage/widget`](https://www.npmjs.com/package/@agentage/widget).
+The kit is the library `@agentage/extension` that owns the server. Its rules, and those of the
+widget kit `@agentage/widget`, are in their npm READMEs.
 
 ## 1. What an extension is
 
@@ -13,37 +14,31 @@ and [`@agentage/widget`](https://www.npmjs.com/package/@agentage/widget).
 - The kit owns the server, `/health`, auth, the store pool, the scheduler and the images. You
   write only the part code.
 
-| Part   | Folder                  | What it does here                                               |
-| ------ | ----------------------- | --------------------------------------------------------------- |
-| pages  | `src/pages`             | `/` shows `{id} {version} · {commit}`                           |
-| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`     |
-| api    | `src/api`               | `GET /api/v1/echo?msg=` (scope `{id}:read`), `GET /api/v1/ping` |
-| mcp    | `src/mcp`               | the tool `{id}__echo` (scope `{id}:read`) on `POST /mcp`        |
-| worker | `src/worker`            | the job `tick`, every minute; it logs `tick` and uses no store  |
-| store  | `migrations/`, `seeds/` | postgres; `GET /api/v1/ping` counts its `pings` rows            |
-| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                             |
+The part table is in [README.md](README.md#what-each-part-does-here).
 
 ## 2. Start
 
-```bash
-agentage extension create <id> [part...]   # no part = all seven
-cd extension-<id> && npm ci && npm run build && agentage extension check
-git init -b master && git add -A && git commit -m "feat: <id> extension"
-```
+The start steps are in [README.md](README.md#start). After `create`:
 
-- The id has lowercase letters, digits and `-`. It starts with a letter. It is not a part name.
 - Keep at least one of pages, ui, api or mcp.
-- `create` deletes the folders and contracts of the parts you do not keep. It writes your id into every file.
+- `create` deletes the folders and contracts of the parts you drop, and writes your id into every
+  text file. It does not edit `ci.yml`.
 - Push to a new public repo `agentage/extension-<id>`, default branch `master`.
-- Edit to the parts you kept: the table of section 1, the README, `description` in `package.json`
-  and `MIN_EXECUTED` in `ci.yml` (the gate's floor: 25 fits all seven parts).
+- Edit to the parts you kept: the part table and the lines of [README.md](README.md), and
+  `description` in `package.json`.
+- `MIN_EXECUTED` in `ci.yml` is the gate's floor, the fewest tests the gate must run (the gate is
+  the e2e suite in agentage/e2e). `25` fits all seven parts. With fewer parts the gate runs fewer
+  tests, so lower it, or the job is red.
 
 ## 3. Write parts
 
 - A part imports only its own folder and `src/lib/`. Each image carries `dist/{part}` and
   `dist/lib` only. `src/manifest.test.ts` refuses a cross-part import.
 - Put code in `src/lib/` only when every kept part can use it.
-- Never use `listen()`, the `process` global (or an import of it), an absolute agentage URL, a symlink or a dependency on another extension in `src/`. The `sealing` rule scans for these. The kit checks the token before a route runs: a part needs no token check.
+- Never use these in `src/`: `listen()`, the `process` global (or an import of it), an absolute
+  agentage URL, a symlink, a dependency on another extension. The `sealing` rule of
+  `agentage extension check` scans for them.
+- The kit checks the token before a route runs. A part needs no token check.
 - Each part has its tests beside it in `src/{part}/`. One part can go without breaking another.
 - Test only the lines you wrote: `check` and the kit's own tests cover the rest.
 - api: declare each route with `route(method, path, { summary, scope?, input?, output? }, handler)`.
@@ -59,37 +54,28 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 
 ## 4. The loop on a laptop
 
-You need Node 22+, npm 10+, Docker, `git` and `jq`.
+The commands are in [README.md](README.md#run-it-on-your-machine). Rules for the agent:
 
-```bash
-npm run verify                                  # type-check, lint, format, tests, build
-npx agentage extension check                    # PASS {id} {version} conforms (6 rules)
-npx agentage extension up                       # ready    N parts healthy    <n> s (each /health body checked)
-npm run test:e2e                                # the widget in a browser, axe WCAG A/AA
-T=$(npx agentage extension token --scope template:read)
-curl -s -H "Authorization: Bearer $T" "localhost:4280/api/v1/echo?msg=hi"
-npx agentage extension down                     # removes this working copy's containers
-```
-
+- Run `npm run verify` and `npx agentage extension check` before every push.
+- `npm run test:e2e` runs the widget test in a browser (axe WCAG A/AA). It needs `up` running and
+  Chromium: `npx playwright install chromium`.
 - `up` runs the release images, postgres with your migrations, a dev issuer (4281) and a gateway
-  (4280) laid out like `next`.
-- `up` writes `.agentage/` (ignored). From cli 0.43, `build` needs a commit.
-- CI runs the same steps, then the e2e gate on local: `npm run e2e -- template gate local` in
+  (4280) laid out like `next` (the shared test environment). It writes `.agentage/` (ignored).
+- `up` and `build` need a git commit, because the image tags come from it.
+- CI runs the same steps, then the e2e gate on local: `npm run e2e -- <id> gate local` in
   agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
 
 ## 5. Release
 
-- Bump the version in `package.json`, run `npx agentage extension check --write`, commit, and
-  push the tag `v{version}` on that commit on master.
-- `release.yml` (`agentage extension release`) then pushes the part images, attaches
-  `agentage-extension.json` to the GitHub release and publishes to npm. The first publish of a
-  new npm name waits for the owner's approval; then add `release.yml` as the trusted publisher
-  on npmjs.com.
+- The steps are in [README.md](README.md#release). `release.yml` runs `agentage extension release`.
+- The first publish of a new npm name waits for the owner's approval. Then add `release.yml` as
+  the trusted publisher on npmjs.com.
 - A re-run only retries npm; a moved tag is refused. A fix is a new version. Never move a `v*` tag.
 - `agentage extension release` refuses the id of the repo this one was copied from, and passes for every other id.
 
 ## 6. The estate row
 
+The estate is the agentage/estate repo that holds the deployment config of every extension.
 These touches are outside this repo. Each is one small PR or one owner action.
 
 | Where                                 | What                                                                     |
@@ -112,7 +98,7 @@ These touches are outside this repo. Each is one small PR or one owner action.
   - A `v*` tag runs `release.yml`: the package and the images.
   - The market lists the version.
   - A row with `version: latest`: the cloud extension opens a PR to `estate.lock`. It merges by itself and the deploy to `next` runs. A red deploy is reverted by a PR.
-  - A row with an exact version (a pin) changes only by a PR to `estate.yaml`.
+  - A row with an exact version (a pin: the version never moves by itself) changes only by a PR to `estate.yaml`.
 
 ## 8. What the platform promises
 
@@ -120,4 +106,4 @@ These touches are outside this repo. Each is one small PR or one owner action.
 - The gateway serves `/`, `/ui/{version}/`, `/api/v1/` and `/mcp`. It drops the `Cookie` header.
 - The estate runs the migrations as a job before the rollout. A release never restarts the store.
 - The same smoke and contract gate runs for every extension in the e2e registry.
-- A kit minor reaches this repo through the Friday Dependabot group PR. Merge it when CI is green.
+- A kit minor reaches this repo through the weekly Dependabot group PR. Merge it when CI is green.
