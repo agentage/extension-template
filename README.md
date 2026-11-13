@@ -1,6 +1,6 @@
 # extension-template
 
-An agentage extension with one of every part. It is for developers who write an extension. An
+An agentage extension with one of every part. It is for extension developers. An
 extension is one npm package. It adds a web page, a widget, an API, MCP tools, a job or CLI
 commands to agentage.
 
@@ -11,7 +11,7 @@ npx @agentage/cli@latest extension create <id> [part...]   # no part = all seven
 A **part** is one folder in `src/`: `pages`, `ui`, `api`, `mcp`, `worker`, `cli`, plus `store`
 (postgres, in `migrations/` and `seeds/`). `create` keeps the parts you name. It deletes the other
 parts. It writes your id into every file. Lines below that name a part apply only when you kept it; delete the others from your README.
-The [id rules](docs/run-locally.md#create) are in the docs.
+See the [id rules](docs/run-locally.md#create).
 
 ## You need
 
@@ -27,9 +27,8 @@ npm run verify                         # type-check, lint, format, test, build
 git init -b master && git add -A && git commit -m "feat: <id> extension"
 ```
 
-Commit before `up`: it needs one git commit, or `COMMIT_SHA` set. `build` needs a clean git tree.
-Use `npx agentage` here. It runs the version this project pins. A global `agentage` can be older and lack
-`extension up`.
+Commit before `up`: it needs a git commit, or `COMMIT_SHA` set. `build` needs a clean tree.
+Use `npx agentage` here. It runs the pinned version. A global `agentage` can be older and lack `extension up`.
 
 More: [when up or build stops](docs/run-locally.md#when-up-or-build-stops).
 
@@ -52,12 +51,12 @@ npx agentage extension down    # removes this folder's containers, network and v
 - `GET /api/v1/ping` is public and answers 200 `pong`.
 - A protected route without a token answers 401.
 
-`openapi.json` (api) and `<id>.mcpc.json` (mcp) list every route and tool. The MCP tool
+`openapi.json` (api) and `<id>.mcpc.json` (mcp) list all routes and tools. The MCP tool
 `<id>__echo` is at `POST /mcp`, with the same token.
 
-More: [full answers](docs/run-locally.md#answers).
+More: [answers](docs/run-locally.md#answers).
 
-Each part serves `/health` on port 3000 inside its container. `up` does not publish it. More:
+Each part serves `/health` on port 3000 in its container. `up` does not publish it. More:
 [Health and logs](docs/run-locally.md#health-and-logs).
 
 ## What each part does here
@@ -76,7 +75,7 @@ A seed in `seeds/` runs once, on an empty store.
 
 ## Change it
 
-[CLAUDE.md](CLAUDE.md) has the rules. After a route or tool changes, regenerate the contract files:
+[CLAUDE.md](CLAUDE.md) has the rules. After a route or tool changes, regenerate the contracts:
 
 ```bash
 npm run build && npx agentage extension check --write && npm run format
@@ -89,7 +88,7 @@ npm run build && npx agentage extension check --write && npm run format
 3. `release.yml` pushes the part images, attaches `agentage-extension.json` to the release and
    publishes the package to npm.
 
-The first publish of a new npm name waits for the owner. A fix is a new version: never move a tag.
+The owner does the first publish of a new npm name. A fix is a new version: never move a tag.
 
 ## Documentation
 

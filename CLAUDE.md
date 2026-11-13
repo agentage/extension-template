@@ -8,7 +8,7 @@ widget kit `@agentage/widget`, are in their npm READMEs.
 
 ## Where facts live
 
-- Start steps, running on a laptop, calling it, health and logs: `README.md` "Start", "Run it on your machine", "Call it", "Health and logs"; detail in `docs/run-locally.md`.
+- Start steps, running on a laptop, calling it, health and logs: `README.md` "Start", "Run it on your machine", "Call it"; health and logs: `docs/run-locally.md` "Health and logs".
 - What each part does and its folder: `README.md` "What each part does here".
 - The manifest, commands, settings and secrets: the `agentage` block of `package.json`.
 - Routes, scopes, status codes (if you kept the api part): `openapi.json` (generated; never edit by hand).
