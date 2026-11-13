@@ -6,6 +6,18 @@ The deployed proof of the same shape is [agentage/extension-probe](https://githu
 The kit is the library `@agentage/extension` that owns the server. Its rules, and those of the
 widget kit `@agentage/widget`, are in their npm READMEs.
 
+## Where facts live
+
+- Start steps, running on a laptop, calling it, health and logs: `README.md` "Start", "Run it on your machine", "Call it", "Health and logs".
+- What each part does and its folder: `README.md` "What each part does here".
+- The manifest, commands, settings and secrets: the `agentage` block of `package.json`.
+- Routes, scopes, status codes (if you kept the api part): `openapi.json` (generated; never edit by hand).
+- MCP tools and their inputs (if you kept the mcp part): `<id>.mcpc.json` (generated; never edit by hand).
+- Database tables and migration rules (if you kept the store part): `migrations/`, `seeds/`; the rules are in section 3 below.
+- CI jobs and the `MIN_EXECUTED` floor: `.github/workflows/ci.yml`. Release rules and refusals: `.github/workflows/release.yml`, `README.md` "Release".
+
+Read the file named here before you read `src/`.
+
 ## 1. What an extension is
 
 - An extension is one npm package. The `agentage` block of `package.json` is its manifest: the
@@ -61,7 +73,6 @@ The commands are in [README.md](README.md#run-it-on-your-machine). Rules for the
   Chromium: `npx playwright install chromium`.
 - `up` runs the release images, postgres with your migrations, a dev issuer (4281) and a gateway
   (4280) laid out like `next` (the shared test environment). It writes `.agentage/` (ignored).
-- `up` needs one git commit, or `COMMIT_SHA` set, because the image tags come from it. `build` also needs a clean tree.
 - CI runs the same steps, then the e2e gate on local: `npm run e2e -- <id> gate local` in
   agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
 
