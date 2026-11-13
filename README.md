@@ -1,7 +1,8 @@
 # extension-template
 
-An agentage extension with one of every part. It is for developers who write an extension: one
-npm package that adds a web page, a widget, an API, MCP tools, a job or CLI commands to agentage.
+An agentage extension with one of every part. It is for developers who write an extension. An
+extension is one npm package. It adds a web page, a widget, an API, MCP tools, a job or CLI
+commands to agentage.
 
 ```bash
 npx @agentage/cli@latest extension create <id> [part...]   # no part = all seven
@@ -50,14 +51,15 @@ npx agentage extension down    # removes this folder's containers, network and v
 
 ### Call it
 
-| Call                                  | Answer                                                  |
-| ------------------------------------- | ------------------------------------------------------- |
-| `GET /api/v1/echo?msg=hi` with token  | 200 `{"success":true,"data":{"msg":"hi","caller":...}}` |
-| `GET /api/v1/ping` (public, no token) | 200 `{"msg":"pong","pings":<rows in the store>}`        |
-| a protected route without a token     | 401 `UNAUTHORIZED`                                      |
-| `echo` without `msg`                  | 400 `VALIDATION_ERROR`, with the field named            |
+| Call                                  | Answer                                                                                       |
+| ------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GET /api/v1/echo?msg=hi` with token  | 200 `{"success":true,"data":{"msg":"hi","caller":...}}`                                      |
+| `GET /api/v1/ping` (public, no token) | 200 `{"success":true,"data":{"msg":"pong","pings":1}}`; `pings` counts the rows in the store |
+| a protected route without a token     | 401 `{"success":false,"error":{"code":"UNAUTHORIZED","message":...,"agcid":...}}`            |
+| `echo` without `msg`                  | 400 `{"success":false,"error":{"code":"VALIDATION_ERROR",...}}`, with the field named        |
 
-Every answer carries an `agcid` request id. `openapi.json` (api) and `<id>.mcpc.json` (mcp) are
+Every answer has an `Agcid` response header with the request id. An error body also carries it as
+`error.agcid`; a success body does not. `openapi.json` (api) and `<id>.mcpc.json` (mcp) are
 the full lists of routes and tools. MCP tool `<id>__echo` is served at `POST /mcp` with the same
 token.
 
@@ -65,10 +67,13 @@ token.
 
 - The gateway answers 404 on `/health`. Each part serves its own `/health` on container port 3000,
   which `up` does not publish. `up` has already checked each one when it prints `ready`.
-- To read one: `docker ps` for the container name, then
-  `docker exec <container> wget -qO- localhost:3000/health`.
-- To read logs: `docker compose -f .agentage/compose.json logs --no-color --tail 80`. A part logs
-  JSON lines with the request's `agcid`. The gateway logs nothing. Run it inside this folder.
+- `docker ps` lists the gateway, the issuer, the store and one container per part you kept. The
+  gateway and the store do not answer on port 3000, so name a part. For the api, run this inside
+  this folder:
+  `docker compose -f .agentage/compose.json exec api wget -qO- localhost:3000/health`.
+- To read logs: `docker compose -f .agentage/compose.json logs --no-color --tail 80 api`. The api
+  logs JSON lines with the request's `agcid`. Without `api` you also get the store's init text.
+  The gateway logs nothing.
 
 ## What each part does here
 
