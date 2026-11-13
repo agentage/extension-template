@@ -61,7 +61,7 @@ The commands are in [README.md](README.md#run-it-on-your-machine). Rules for the
   Chromium: `npx playwright install chromium`.
 - `up` runs the release images, postgres with your migrations, a dev issuer (4281) and a gateway
   (4280) laid out like `next` (the shared test environment). It writes `.agentage/` (ignored).
-- `up` and `build` need a git commit, because the image tags come from it.
+- `up` needs one git commit, or `COMMIT_SHA` set, because the image tags come from it. `build` also needs a clean tree.
 - CI runs the same steps, then the e2e gate on local: `npm run e2e -- <id> gate local` in
   agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
 
