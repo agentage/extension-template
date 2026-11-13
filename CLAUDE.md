@@ -43,7 +43,7 @@ git init -b master && git add -A && git commit -m "feat: <id> extension"
 - A part imports only its own folder and `src/lib/`. Each image carries `dist/{part}` and
   `dist/lib` only. `src/manifest.test.ts` refuses a cross-part import.
 - Put code in `src/lib/` only when every kept part can use it.
-- Never use `listen()`, the `process` global, a token check or an absolute agentage URL in `src/`.
+- Never use `listen()`, the `process` global (or an import of it), an absolute agentage URL, a symlink or a dependency on another extension in `src/`. The `sealing` rule scans for these. The kit checks the token before a route runs: a part needs no token check.
 - Each part has its tests beside it in `src/{part}/`. One part can go without breaking another.
 - Test only the lines you wrote: `check` and the kit's own tests cover the rest.
 - api: declare each route with `route(method, path, { summary, scope?, input?, output? }, handler)`.
@@ -99,6 +99,7 @@ These touches are outside this repo. Each is one small PR or one owner action.
 | the `GATE_TOKENS` secret (owner)      | a `"{id}"` entry: the bearer your gate sends on `next`                   |
 | agentage/auth `pat-scopes.ts` (owner) | the id in `EXTENSION_IDS`: echo declares `{id}:read`, so it is needed    |
 
+- A row can also set `host`, `market`, `public`, `source`, `resources` and `settings`. The schema in the estate repo is the full list.
 - Pools: `web` for pages and ui, `api` for api, mcp and worker, `data` for store. Host: `{id}.next.agentage.io`.
 
 ## 7. Operate
@@ -107,7 +108,11 @@ These touches are outside this repo. Each is one small PR or one owner action.
   `/health`, then runs your gate: `npm run e2e -- {id} gate next`.
 - Read a red run on the Actions tab of agentage/estate. The run names the part and the check.
   A part logs JSON lines with the request's `agcid`: search for it.
-- To change what runs, release a new version and change the version in the estate row.
+- A release goes live so:
+  - A `v*` tag runs `release.yml`: the package and the images.
+  - The market lists the version.
+  - A row with `version: latest`: the cloud extension opens a PR to `estate.lock`. It merges by itself and the deploy to `next` runs. A red deploy is reverted by a PR.
+  - A row with an exact version (a pin) changes only by a PR to `estate.yaml`.
 
 ## 8. What the platform promises
 
