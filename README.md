@@ -29,8 +29,9 @@ npm run verify                         # type-check, lint, format, tests, build
 git init -b master && git add -A && git commit -m "feat: <id> extension"
 ```
 
-Commit before `up`: `up` and `build` need a git commit, and stop with "is not a git checkout"
-without one. Use `npx agentage` inside this folder. The global `agentage` can be older than the
+Commit before `up`: `up` needs one git commit, or `COMMIT_SHA` set. Without one it fails with
+`git rev-parse failed`. `build` needs a clean tree: it stops with "is not a git checkout" outside a repo,
+and with "has uncommitted changes: commit first" on a dirty tree. Use `npx agentage` inside this folder. The global `agentage` can be older than the
 version this project pins in `devDependencies`, and then it lacks `extension up`.
 
 ## Run it on your machine
@@ -67,8 +68,9 @@ token.
 
 - The gateway answers 404 on `/health`. Each part serves its own `/health` on container port 3000,
   which `up` does not publish. `up` has already checked each one when it prints `ready`.
-- `docker ps` lists the gateway, the issuer, the store and one container per part you kept. The
-  gateway and the store do not answer on port 3000, so name a part. For the api, run this inside
+- `docker ps` lists the gateway, the issuer and one container each for the parts `pages`, `ui`, `api`,
+  `mcp` and `worker` that you kept. The `cli` part has no container. The store is a container only
+  when you kept `store`, and its migrate job exits. The gateway and the store do not answer on port 3000, so name a part. For the api, run this inside
   this folder:
   `docker compose -f .agentage/compose.json exec api wget -qO- localhost:3000/health`.
 - To read logs: `docker compose -f .agentage/compose.json logs --no-color --tail 80 api`. The api
