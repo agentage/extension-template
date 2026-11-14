@@ -1,8 +1,8 @@
 # extension-template
 
 An agentage extension with one of every part (a part is one folder in `src/`; the `store` part is
-`migrations/` and `seeds/`). It is for extension developers. An extension is one npm package. It adds a web page, a widget, an API, MCP tools, a job or CLI
-commands to agentage.
+`migrations/` and `seeds/`). It is for extension developers. An extension is one npm package. It adds
+a web page, a widget, an API, MCP tools, a job or CLI commands to agentage.
 
 You need Node 22 or newer, npm 10 or newer, Docker and git. Nothing needs a sign-in.
 
