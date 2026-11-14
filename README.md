@@ -1,21 +1,18 @@
 # extension-template
 
-An agentage extension with one of every part. It is for extension developers. An
-extension is one npm package. It adds a web page, a widget, an API, MCP tools, a job or CLI
-commands to agentage.
+An agentage extension with one of every part (a part is one folder in `src/`; the `store` part is
+`migrations/` and `seeds/`). It is for extension developers. An extension is one npm package. It adds
+a web page, a widget, an API, MCP tools, a job or CLI commands to agentage.
+
+You need Node 22 or newer, npm 10 or newer, Docker and git. Nothing needs a sign-in.
 
 ```bash
 npx @agentage/cli@latest extension create <id> [part...]   # no part = all seven
 ```
 
-A **part** is one folder in `src/`: `pages`, `ui`, `api`, `mcp`, `worker`, `cli`, plus `store`
-(postgres, in `migrations/` and `seeds/`). `create` keeps the parts you name. It deletes the other
-parts. It writes your id into every file. Lines below that name a part apply only when you kept it; delete the others from your README.
-See the [id rules](docs/run-locally.md#create).
-
-## You need
-
-Node 22 or newer, npm 10 or newer, Docker and git. Nothing needs a sign-in.
+The parts are `pages`, `ui`, `api`, `mcp`, `worker`, `cli` and `store` (postgres). `create` keeps
+the parts you name and deletes the other parts. It writes your id into every file. In your copy,
+delete the README lines about parts you did not keep. See the [id rules](docs/run-locally.md#create).
 
 ## Start
 
