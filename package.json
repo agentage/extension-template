@@ -17,7 +17,7 @@
   },
   "engines": {
     "node": ">=22",
-    "agentage": "^0.12"
+    "agentage": "^0.13"
   },
   "agentage": {
     "id": "template",
@@ -68,7 +68,7 @@
     "prepublishOnly": "npm run verify"
   },
   "dependencies": {
-    "@agentage/extension": "0.12.2",
+    "@agentage/extension": "0.13.0",
     "express": "^5.1.0",
     "zod": "^4.2.0"
   },
