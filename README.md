@@ -32,7 +32,7 @@ More: [when up or build stops](docs/run-locally.md#when-up-or-build-stops).
 ## Run it on your machine
 
 ```bash
-npx agentage extension up      # Docker; prints "ready N parts healthy" when done
+npx agentage extension up --docker  # Docker; prints "ready N parts healthy" when done
 T=$(npx agentage extension token --scope <id>:read)
 curl -s -H "Authorization: Bearer $T" "localhost:4280/api/template/echo?msg=hi"
 npx agentage extension down    # removes this folder's containers, network and volume

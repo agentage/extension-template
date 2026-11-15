@@ -13,7 +13,7 @@ export function create({ route, store, extension }: ApiContext) {
   const output = z.object({ msg: z.string(), caller: z.string() });
   route('get', '/echo', { summary: 'Echo msg', input, output }, (req) => ({
     msg: req.input.msg,
-    caller: req.caller.sub,
+    caller: req.caller?.sub ?? 'local',
   }));
   const pong = z.object({ msg: z.string(), pings: z.int().nullable() });
   route('get', '/ping', { summary: 'Answer pong', scope: 'public', output: pong }, async () => ({

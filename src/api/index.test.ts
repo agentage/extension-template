@@ -1,4 +1,5 @@
 import {
+  type ApiContext,
   createTestContext,
   ok,
   startTestServer,
@@ -58,5 +59,19 @@ describe('GET /api/template/ping', () => {
   it.runIf(store)('counts the seeded row: the migration and the seed ran', async () => {
     const res = await server.fetch('/api/template/ping');
     expect(await res.json()).toEqual(ok({ msg: 'pong', pings: 1 }));
+  });
+});
+
+describe('GET /api/template/echo with no token check', () => {
+  it('names the caller local when the request has no caller', () => {
+    const handlers: Record<string, (req: unknown) => unknown> = {};
+    const route = ((_m: string, path: string, _o: unknown, h: (req: unknown) => unknown) => {
+      handlers[path] = h;
+    }) as unknown as ApiContext['route'];
+    create({ ...ctx, route } as ApiContext);
+    expect(handlers['/echo']?.({ input: { msg: 'hi' }, caller: null })).toEqual({
+      msg: 'hi',
+      caller: 'local',
+    });
   });
 });
