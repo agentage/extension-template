@@ -32,9 +32,9 @@ More: [when up or build stops](docs/run-locally.md#when-up-or-build-stops).
 ## Run it on your machine
 
 ```bash
-npx agentage extension up      # Docker; prints "ready N parts healthy" when done
+npx agentage extension up --docker  # Docker; prints "ready N parts healthy" when done
 T=$(npx agentage extension token --scope <id>:read)
-curl -s -H "Authorization: Bearer $T" "localhost:4280/api/v1/echo?msg=hi"
+curl -s -H "Authorization: Bearer $T" "localhost:4280/api/template/echo?msg=hi"
 npx agentage extension down    # removes this folder's containers, network and volume
 ```
 
@@ -44,8 +44,8 @@ npx agentage extension down    # removes this folder's containers, network and v
 
 ### Call it
 
-- `GET /api/v1/echo?msg=hi` with a token answers 200; without `msg`, 400.
-- `GET /api/v1/ping` is public and answers 200 `pong`.
+- `GET /api/template/echo?msg=hi` with a token answers 200; without `msg`, 400.
+- `GET /api/template/ping` is public and answers 200 `pong`.
 - A protected route without a token answers 401.
 
 `openapi.json` (api) and `<id>.mcpc.json` (mcp) list all routes and tools. The MCP tool
@@ -58,15 +58,15 @@ Each part serves `/health` on port 3000 in its container. `up` does not publish 
 
 ## What each part does here
 
-| Part   | Folder                  | What it does                                                        |
-| ------ | ----------------------- | ------------------------------------------------------------------- |
-| pages  | `src/pages`             | `/` shows the id, version and commit                                |
-| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`         |
-| api    | `src/api`               | `GET /api/v1/echo` (scope `{id}:read`), `GET /api/v1/ping` (public) |
-| mcp    | `src/mcp`               | the tool `{id}__echo` (scope `{id}:read`)                           |
-| worker | `src/worker`            | the job `tick`, every minute                                        |
-| store  | `migrations/`, `seeds/` | postgres; `ping` counts the rows of `pings`                         |
-| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                                 |
+| Part   | Folder                  | What it does                                                                    |
+| ------ | ----------------------- | ------------------------------------------------------------------------------- |
+| pages  | `src/pages`             | `/` shows the id, version and commit                                            |
+| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`                     |
+| api    | `src/api`               | `GET /api/template/echo` (scope `{id}:read`), `GET /api/template/ping` (public) |
+| mcp    | `src/mcp`               | the tool `{id}__echo` (scope `{id}:read`)                                       |
+| worker | `src/worker`            | the job `tick`, every minute                                                    |
+| store  | `migrations/`, `seeds/` | postgres; `ping` counts the rows of `pings`                                     |
+| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                                             |
 
 A seed in `seeds/` runs once, on an empty store.
 

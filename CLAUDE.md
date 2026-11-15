@@ -114,7 +114,7 @@ These touches are outside this repo. Each is one small PR or one owner action.
 ## 8. What the platform promises
 
 - The kit checks the token and the declared scope before your route or tool runs.
-- The gateway serves `/`, `/ui/{version}/`, `/api/v1/` and `/mcp`. It drops the `Cookie` header.
+- The gateway serves `/`, `/ui/{version}/`, `/api/{id}/` and `/mcp`. It drops the `Cookie` header.
 - The estate runs the migrations as a job before the rollout. A release never restarts the store.
 - The same smoke and contract gate runs for every extension in the e2e registry.
 - A kit minor reaches this repo through the weekly Dependabot group PR. Merge it when CI is green.

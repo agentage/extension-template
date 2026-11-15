@@ -21,12 +21,12 @@ in that folder, or find the holder with `docker ps`.
 
 ## Answers
 
-| Call                                  | Answer                                                                                       |
-| ------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `GET /api/v1/echo?msg=hi` with token  | 200 `{"success":true,"data":{"msg":"hi","caller":...}}`                                      |
-| `GET /api/v1/ping` (public, no token) | 200 `{"success":true,"data":{"msg":"pong","pings":1}}`; `pings` counts the rows in the store |
-| a protected route without a token     | 401 `{"success":false,"error":{"code":"UNAUTHORIZED","message":...,"agcid":...}}`            |
-| `echo` without `msg`                  | 400 `{"success":false,"error":{"code":"VALIDATION_ERROR",...}}`, with the field named        |
+| Call                                        | Answer                                                                                       |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `GET /api/template/echo?msg=hi` with token  | 200 `{"success":true,"data":{"msg":"hi","caller":...}}`                                      |
+| `GET /api/template/ping` (public, no token) | 200 `{"success":true,"data":{"msg":"pong","pings":1}}`; `pings` counts the rows in the store |
+| a protected route without a token           | 401 `{"success":false,"error":{"code":"UNAUTHORIZED","message":...,"agcid":...}}`            |
+| `echo` without `msg`                        | 400 `{"success":false,"error":{"code":"VALIDATION_ERROR",...}}`, with the field named        |
 
 Every answer has an `Agcid` response header with the request id. An error body also carries it as
 `error.agcid`. A success body does not.

@@ -1,4 +1,5 @@
 import {
+  type ApiContext,
   createTestContext,
   ok,
   startTestServer,
@@ -21,9 +22,9 @@ afterAll(async () => {
   await ctx.close();
 });
 
-describe('GET /api/v1/echo', () => {
+describe('GET /api/template/echo', () => {
   it('echoes msg and names the caller', async () => {
-    const res = await server.fetch('/api/v1/echo?msg=hi');
+    const res = await server.fetch('/api/template/echo?msg=hi');
     expect(await res.json()).toEqual(ok({ msg: 'hi', caller: 'usr_test' }));
   });
 
@@ -31,18 +32,18 @@ describe('GET /api/v1/echo', () => {
     ['empty', ''],
     ['over 200 characters', 'x'.repeat(201)],
   ])('refuses a msg %s', async (_name, msg) => {
-    expect((await server.fetch(`/api/v1/echo?msg=${msg}`)).status).toBe(400);
+    expect((await server.fetch(`/api/template/echo?msg=${msg}`)).status).toBe(400);
   });
 });
 
 const ping = async (ctx: PartContext) => {
   const one = await startTestServer({ create, ctx });
-  const body: unknown = await (await one.fetch('/api/v1/ping')).json();
+  const body: unknown = await (await one.fetch('/api/template/ping')).json();
   await one.close();
   return body;
 };
 
-describe('GET /api/v1/ping', () => {
+describe('GET /api/template/ping', () => {
   it('counts the rows of pings when the manifest keeps the store', async () => {
     const counted = { query: async () => ({ rows: [{ n: 3 }] }) } as Store;
     const ctx = createTestContext({ extension: { store: 'postgres' } });
@@ -56,7 +57,21 @@ describe('GET /api/v1/ping', () => {
   });
 
   it.runIf(store)('counts the seeded row: the migration and the seed ran', async () => {
-    const res = await server.fetch('/api/v1/ping');
+    const res = await server.fetch('/api/template/ping');
     expect(await res.json()).toEqual(ok({ msg: 'pong', pings: 1 }));
+  });
+});
+
+describe('GET /api/template/echo with no token check', () => {
+  it('names the caller local when the request has no caller', () => {
+    const handlers: Record<string, (req: unknown) => unknown> = {};
+    const route = ((_m: string, path: string, _o: unknown, h: (req: unknown) => unknown) => {
+      handlers[path] = h;
+    }) as unknown as ApiContext['route'];
+    create({ ...ctx, route } as ApiContext);
+    expect(handlers['/echo']?.({ input: { msg: 'hi' }, caller: null })).toEqual({
+      msg: 'hi',
+      caller: 'local',
+    });
   });
 });

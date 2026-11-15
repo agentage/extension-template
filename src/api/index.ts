@@ -7,13 +7,13 @@ const countPings = async (store: Store) => {
   return n;
 };
 
-// Mounted at /api/v1; openapi.json is generated from these routes.
+// Mounted at /api/template; openapi.json is generated from these routes.
 export function create({ route, store, extension }: ApiContext) {
   const input = z.object({ msg: z.string().min(1).max(200) });
   const output = z.object({ msg: z.string(), caller: z.string() });
   route('get', '/echo', { summary: 'Echo msg', input, output }, (req) => ({
     msg: req.input.msg,
-    caller: req.caller.sub,
+    caller: req.caller?.sub ?? 'local',
   }));
   const pong = z.object({ msg: z.string(), pings: z.int().nullable() });
   route('get', '/ping', { summary: 'Answer pong', scope: 'public', output: pong }, async () => ({
