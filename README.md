@@ -31,6 +31,11 @@ More: [when up or build stops](docs/run-locally.md#when-up-or-build-stops).
 
 ## Run it on your machine
 
+`npx agentage extension up` runs the folder on the daemon (127.0.0.1:4243): api, mcp (`/mcp/<id>`) and
+worker in one sealed child, no token, and each saved change in `src/` reloads it. `extension down` removes the row.
+
+With Docker, `up --docker` runs the release images, as a deployment does:
+
 ```bash
 npx agentage extension up --docker  # Docker; prints "ready N parts healthy" when done
 T=$(npx agentage extension token --scope <id>:read)
