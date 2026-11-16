@@ -38,7 +38,8 @@ jobs:
         run: node_modules/.bin/agentage extension check
 
   local:
-    name: up --docker and the e2e gate on docker
+    # The name stays: a required check of the ruleset.
+    name: up and the e2e gate on local
     runs-on: ubuntu-latest
     # The gate on docker stays under 10 minutes; slower is a regression.
     timeout-minutes: 10
