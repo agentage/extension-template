@@ -65,15 +65,7 @@ export default [
   {
     files: ['src/app/**/*.tsx'],
     rules: {
-      'no-restricted-globals': ['error', { name: 'fetch', message: FETCH }],
-      'no-restricted-properties': [
-        'error',
-        ...['window', 'globalThis', 'self'].map((object) => ({
-          object,
-          property: 'fetch',
-          message: FETCH,
-        })),
-      ],
+      'no-restricted-syntax': ['error', { selector: "Identifier[name='fetch']", message: FETCH }],
     },
   },
 ];
