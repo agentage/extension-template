@@ -8,13 +8,15 @@ widget kit `@agentage/widget`, are in their npm READMEs.
 
 ## Where facts live
 
-- Start steps, running on a laptop, calling it, health and logs: `README.md` "Start", "Run it on your machine", "Call it"; health and logs: `docs/run-locally.md` "Health and logs".
-- What each part does and its folder: `README.md` "What each part does here".
+- Start steps, running on a laptop, calling it, health and logs: `README.md` "Quick start", "Run it on your machine", "Call it"; health and logs: `docs/run-locally.md` "Health and logs".
+- What each part does and its folder: `README.md` "What it serves".
 - The manifest, commands, settings and secrets: the `agentage` block of `package.json`.
 - Routes, scopes, status codes (if you kept the api part): `openapi.json` (generated; never edit by hand).
 - MCP tools and their inputs (if you kept the mcp part): `<id>.mcpc.json` (generated; never edit by hand).
 - Database tables and migration rules (if you kept the store part): `migrations/`, `seeds/`; the rules are in section 3 below.
 - CI jobs and the `MIN_EXECUTED` floor: `.github/workflows/ci.yml`. Release rules and refusals: `.github/workflows/release.yml`, `README.md` "Release".
+- How a release goes live: `README.md` "Deploy", sections 6 and 7 below.
+- The target design (the extension model, the app host, the app shell): the north star in the agentage product vault, `projects/architecture/`. Do not copy it into this repo.
 
 Read the file named here before you read `src/`.
 
@@ -26,11 +28,11 @@ Read the file named here before you read `src/`.
 - The kit owns the server, `/health`, auth, the store pool, the scheduler and the images. You
   write only the part code.
 
-The part table is in [README.md](README.md#what-each-part-does-here).
+The part table is in [README.md](README.md#what-it-serves).
 
 ## 2. Start
 
-The start steps are in [README.md](README.md#start). After `create`:
+The start steps are in [README.md](README.md#quick-start). After `create`:
 
 - Keep at least one of pages, ui, api or mcp.
 - `create` deletes the folders and contracts of the parts you drop, and writes your id into every
@@ -71,50 +73,59 @@ The commands are in [README.md](README.md#run-it-on-your-machine). Rules for the
 - Run `npm run verify` and `npx agentage extension check` before every push.
 - `npm run test:e2e` runs the widget test in a browser (axe WCAG A/AA). It needs `up` running and
   Chromium: `npx playwright install chromium`.
-- `up` runs the release images, postgres with your migrations, a dev issuer (4281) and a gateway
-  (4280) laid out like `next` (the shared test environment). It writes `.agentage/` (ignored).
-- CI runs the same steps, then the e2e gate on local: `npm run e2e -- <id> gate local` in
-  agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
+- `up` runs the folder on the daemon and reloads each saved change. `up --docker` runs the release
+  images, postgres with your migrations, a dev issuer (4281) and a gateway (4280) laid out like
+  `next` (the shared test environment). Both write `.agentage/` (ignored).
+- CI runs the same steps with `up --docker`, then the e2e gate: `npm run e2e -- template gate docker`
+  in agentage/e2e. The gate needs your row in its `extensions.json` (section 6). It never retries.
 
 ## 5. Release
 
 - The steps are in [README.md](README.md#release). `release.yml` runs `agentage extension release`.
+- The release attaches two records to the GitHub release: `agentage-extension.json` (the part
+  images by digest) and `agentage-container.json` (the one image an app host runs).
+- A package with `"private": true` is never published to npm.
 - The first publish of a new npm name waits for the owner's approval. Then add `release.yml` as
   the trusted publisher on npmjs.com.
 - A re-run only retries npm; a moved tag is refused. A fix is a new version. Never move a `v*` tag.
 - `agentage extension release` refuses the id of the repo this one was copied from, and passes for every other id.
 
-## 6. The estate row
+## 6. The deployment row
 
-The estate is the agentage/estate repo that holds the deployment config of every extension.
-These touches are outside this repo. Each is one small PR or one owner action.
+An extension runs where an operator lists it. These touches are outside this repo. Each is one
+small PR or one owner action.
 
-| Where                                 | What                                                                     |
-| ------------------------------------- | ------------------------------------------------------------------------ |
-| agentage/estate `estate.yaml`         | `extensions.{id}: { version, parts: { api: api, ... } }`                 |
-| agentage/e2e `extensions.json`        | `{ "id": "{id}", "token": "GATE_TOKENS", "targets": ["local", "next"] }` |
-| the `GATE_TOKENS` secret (owner)      | a `"{id}"` entry: the bearer your gate sends on `next`                   |
-| agentage/auth `pat-scopes.ts` (owner) | the id in `EXTENSION_IDS`: echo declares `{id}:read`, so it is needed    |
+| Where                                 | What                                                                      |
+| ------------------------------------- | ------------------------------------------------------------------------- |
+| agentage/apphosts `installation.json` | `{ "id": "{id}", "version", "store", "expose": { "api": "public" } }`     |
+| agentage/estate `estate.yaml`         | `extensions.{id}: { version, parts: { api: api, ... } }`                  |
+| agentage/e2e `extensions.json`        | `{ "id": "{id}", "token": "GATE_TOKENS", "targets": ["docker", "next"] }` |
+| the `GATE_TOKENS` secret (owner)      | a `"{id}"` entry: the bearer your gate sends on `next`                    |
+| agentage/auth `pat-scopes.ts` (owner) | the id in `EXTENSION_IDS`: echo declares `{id}:read`, so it is needed     |
 
-- A row can also set `host`, `market`, `public`, `source`, `resources` and `settings`. The schema in the estate repo is the full list.
-- Pools: `web` for pages and ui, `api` for api, mcp and worker, `data` for store. Host: `{id}.next.agentage.io`.
+- An extension has one of the two rows. The `installation.json` row puts it on an app host: one
+  service at `{app host}/api/{id}/...` and `{app host}/mcp/{id}`. This is the target shape.
+- The `estate.yaml` row is the older shape: one container per part at `{id}.next.agentage.io`.
+  It can also set `host`, `market`, `public`, `source`, `resources` and `settings`. Pools: `web`
+  for pages and ui, `api` for api, mcp and worker, `data` for store.
+- The schema of each file is in its repo.
 
 ## 7. Operate
 
-- A merge to estate master deploys `next`. The deploy applies the stacks, checks each part's
+- A merge to estate master, or to apphosts master, deploys `next`. The deploy applies the stacks, checks each part's
   `/health`, then runs your gate: `npm run e2e -- {id} gate next`.
 - Read a red run on the Actions tab of agentage/estate. The run names the part and the check.
   A part logs JSON lines with the request's `agcid`: search for it.
 - A release goes live so:
-  - A `v*` tag runs `release.yml`: the package and the images.
+  - A `v*` tag runs `release.yml`: the images, the records and the package.
   - The market lists the version.
-  - A row with `version: latest`: the cloud extension opens a PR to `estate.lock`. It merges by itself and the deploy to `next` runs. A red deploy is reverted by a PR.
-  - A row with an exact version (a pin: the version never moves by itself) changes only by a PR to `estate.yaml`.
+  - A floating row (`"track": "latest"` in `installation.json`, `version: latest` in `estate.yaml`): the cloud extension opens a PR that changes the version. It merges by itself and the deploy to `next` runs. A red deploy is reverted by a PR.
+  - A row with an exact version (a pin: the version never moves by itself) changes only by a PR to its file.
 
 ## 8. What the platform promises
 
 - The kit checks the token and the declared scope before your route or tool runs.
-- The gateway serves `/`, `/ui/{version}/`, `/api/{id}/` and `/mcp`. It drops the `Cookie` header.
+- The gateway of `up --docker` serves `/`, `/ui/{version}/`, `/api/{id}/` and `/mcp`. It drops the `Cookie` header.
 - The estate runs the migrations as a job before the rollout. A release never restarts the store.
 - The same smoke and contract gate runs for every extension in the e2e registry.
 - A kit minor reaches this repo through the weekly Dependabot group PR. Merge it when CI is green.
