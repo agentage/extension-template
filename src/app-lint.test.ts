@@ -9,7 +9,7 @@ const lint = async (code: string, filePath: string) => {
 vi.setConfig({ testTimeout: 30_000 });
 
 describe('the app lint rule: no raw fetch in src/app', () => {
-  it.each(['fetch("/x")', 'window.fetch("/x")', 'globalThis.fetch("/x")'])(
+  it.each(['fetch('/x')', 'window.fetch('/x')', 'globalThis.fetch('/x')'])(
     '%s is refused',
     async (code) => {
       const rules = await lint(`export const x = () => ${code};\n`, 'src/app/index.tsx');
@@ -18,7 +18,7 @@ describe('the app lint rule: no raw fetch in src/app', () => {
   );
 
   it('fetch outside src/app is allowed', async () => {
-    const rules = await lint('export const x = () => fetch("/x");\n', 'src/api/index.ts');
+    const rules = await lint('export const x = () => fetch('/x');\n', 'src/api/index.ts');
     expect(rules.filter((id) => id?.startsWith('no-restricted-'))).toEqual([]);
   });
 });
