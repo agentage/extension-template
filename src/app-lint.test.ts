@@ -1,8 +1,10 @@
 import { ESLint } from 'eslint';
 import { describe, expect, it, vi } from 'vitest';
 
+const eslint = new ESLint();
+
 const lint = async (code: string, filePath: string) => {
-  const [result] = await new ESLint().lintText(code, { filePath });
+  const [result] = await eslint.lintText(code, { filePath });
   return result?.messages.map((m) => m.ruleId ?? m.message.slice(0, 200)) ?? [];
 };
 
