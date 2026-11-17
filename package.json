@@ -1,6 +1,6 @@
 {
   "name": "@agentage/extension-template",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An agentage extension: start from this repo with agentage extension create",
   "type": "module",
   "license": "MIT",
@@ -74,7 +74,7 @@
     "prepublishOnly": "npm run verify"
   },
   "dependencies": {
-    "@agentage/extension": "^0.18.1",
+    "@agentage/extension": "^0.18.4",
     "express": "^5.1.0",
     "zod": "^4.2.0"
   },
