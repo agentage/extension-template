@@ -10,7 +10,7 @@ You need Node 22 or newer, npm 10 or newer, Docker and git. Nothing needs a sign
 npx @agentage/cli@latest extension create <id> [part...]   # no part = all seven
 ```
 
-The parts are `pages`, `ui`, `api`, `mcp`, `worker`, `cli` and `store` (postgres). `create` keeps
+The parts are `pages`, `ui`, `api`, `mcp`, `worker`, `cli`, `app` and `store` (postgres). `create` keeps
 the parts you name and deletes the other parts. It writes your id into every file. In your copy,
 delete the README lines about parts you did not keep. See the [id rules](docs/run-locally.md#create).
 
@@ -63,15 +63,16 @@ Each part serves `/health` on port 3000 in its container. `up` does not publish 
 
 ## What each part does here
 
-| Part   | Folder                  | What it does                                                                    |
-| ------ | ----------------------- | ------------------------------------------------------------------------------- |
-| pages  | `src/pages`             | `/` shows the id, version and commit                                            |
-| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`                     |
-| api    | `src/api`               | `GET /api/template/echo` (scope `{id}:read`), `GET /api/template/ping` (public) |
-| mcp    | `src/mcp`               | the tool `{id}__echo` (scope `{id}:read`)                                       |
-| worker | `src/worker`            | the job `tick`, every minute                                                    |
-| store  | `migrations/`, `seeds/` | postgres; `ping` counts the rows of `pings`                                     |
-| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                                             |
+| Part   | Folder                  | What it does                                                                     |
+| ------ | ----------------------- | -------------------------------------------------------------------------------- |
+| pages  | `src/pages`             | `/` shows the id, version and commit                                             |
+| ui     | `src/ui`                | the widget `<{id}-echo>`, served at `/ui/{version}/{id}.js`                      |
+| api    | `src/api`               | `GET /api/template/echo` (scope `{id}:read`), `GET /api/template/ping` (public)  |
+| mcp    | `src/mcp`               | the tool `{id}__echo` (scope `{id}:read`)                                        |
+| worker | `src/worker`            | the job `tick`, every minute                                                     |
+| store  | `migrations/`, `seeds/` | postgres; `ping` counts the rows of `pings`                                      |
+| cli    | `src/cli`               | `agentage ping [msg]` prints `pong`                                              |
+| app    | `src/app`               | the shell page `/{id}`: an Echo button that calls the api through `useAppHost()` |
 
 A seed in `seeds/` runs once, on an empty store.
 

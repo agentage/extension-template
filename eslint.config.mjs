@@ -56,8 +56,17 @@ export default [
     },
   },
   {
-    files: ['src/ui/**/*.tsx'],
+    files: ['src/ui/**/*.tsx', 'src/app/**/*.tsx'],
     plugins: { 'jsx-a11y': jsxA11y, 'react-hooks': reactHooks },
     rules: { ...jsxA11y.flatConfigs.recommended.rules, ...reactHooks.configs.recommended.rules },
+  },
+  {
+    files: ['src/app/**/*.tsx'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        { name: 'fetch', message: 'Use useAppHost().api: the shell owns auth and the id.' },
+      ],
+    },
   },
 ];

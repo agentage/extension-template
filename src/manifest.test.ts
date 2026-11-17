@@ -16,7 +16,7 @@ const UI = './ui/index.js';
 
 const sources = (): [string, string][] =>
   readdirSync(SRC, { recursive: true, encoding: 'utf8' })
-    .filter((file) => /\.tsx?$/.test(file) && !/\.(test|spec)\.ts$/.test(file))
+    .filter((file) => /\.tsx?$/.test(file) && !/\.(test|spec)\.tsx?$/.test(file))
     .map((file) => [file, readFileSync(new URL(file, SRC), 'utf8')]);
 
 const relativeImports = (text: string): string[] =>
@@ -28,8 +28,9 @@ describe('the manifest', () => {
     expect(imageParts(manifest)).toEqual(folders);
     const store = has('../migrations') ? { store: 'postgres' } : {};
     const cli = has('cli') ? { cli: true } : {};
+    const app = has('app') ? { app: true } : {};
     const parts = Object.fromEntries(folders.map((part) => [part, true]));
-    expect(manifest.agentage.parts).toEqual({ ...parts, ...cli, ...store });
+    expect(manifest.agentage.parts).toEqual({ ...parts, ...cli, ...app, ...store });
     expect(manifest.agentage.commands?.map(({ name }) => name)).toEqual(
       has('cli') ? ['ping'] : undefined
     );

@@ -17,7 +17,7 @@
   },
   "engines": {
     "node": ">=22",
-    "agentage": "^0.15 || ^0.16"
+    "agentage": "^0.18.1"
   },
   "agentage": {
     "id": "template",
@@ -28,7 +28,8 @@
       "mcp": true,
       "worker": true,
       "cli": true,
-      "store": "postgres"
+      "store": "postgres",
+      "app": true
     },
     "commands": [
       {
@@ -44,7 +45,12 @@
       }
     ],
     "settings": {},
-    "secrets": []
+    "secrets": [],
+    "app": {
+      "title": "template",
+      "icon": "layout-dashboard",
+      "order": 50
+    }
   },
   "exports": {
     "./agentage-extension.json": "./dist/agentage-extension.json",
@@ -56,7 +62,7 @@
     "!dist/**/*.test.*"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && (test ! -d src/ui || agentage-widget bundle)",
+    "build": "tsc -p tsconfig.build.json && (test ! -d src/ui || agentage-widget bundle) && node node_modules/@agentage/extension/dist/tool/cli.js app",
     "type-check": "tsc --noEmit -p tsconfig.eslint.json",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -68,31 +74,38 @@
     "prepublishOnly": "npm run verify"
   },
   "dependencies": {
-    "@agentage/extension": "0.16.0",
+    "@agentage/extension": "^0.18.1",
     "express": "^5.1.0",
     "zod": "^4.2.0"
   },
   "devDependencies": {
-    "@agentage/cli": "0.54.0",
+    "@agentage/cli": "0.56.0",
+    "@agentage/design-system": "0.20.1",
     "@agentage/widget": "^0.3.0",
     "@axe-core/playwright": "4.14.0",
     "@electric-sql/pglite": "0.5.16",
     "@playwright/test": "1.65.0",
+    "@tailwindcss/postcss": "4.3.5",
     "@types/express": "5.0.6",
     "@types/node": "26.6.6",
     "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "@typescript-eslint/eslint-plugin": "8.72.2",
     "@typescript-eslint/parser": "8.72.2",
     "@vitest/coverage-v8": "5.1.0",
+    "esbuild": "0.28.2",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-playwright": "2.12.2",
     "eslint-plugin-prettier": "5.5.7",
     "eslint-plugin-react-hooks": "7.1.1",
+    "jsdom": "31.0.1",
+    "postcss": "8.5.33",
     "prettier": "3.9.10",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "tailwindcss": "4.3.5",
     "typescript": "6.0.3",
     "vitest": "5.1.0"
   },
