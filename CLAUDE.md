@@ -24,7 +24,8 @@ Read the file named here before you read `src/`.
 
 - An extension is one npm package. The `agentage` block of `package.json` is its manifest: the
   id, the parts, the commands, the settings and the secrets.
-- A part is one folder in `src/`. Each exports `create(ctx)` only; the ui part exports `widgets`.
+- A part is one folder in `src/`. Each exports `create(ctx)` only; the ui part exports `widgets`,
+  and the app part (`src/app/index.tsx`) a default root component for the shell.
 - The kit owns the server, `/health`, auth, the store pool, the scheduler and the images. You
   write only the part code.
 
@@ -41,7 +42,7 @@ The start steps are in [README.md](README.md#quick-start). After `create`:
 - Edit to the parts you kept: the part table and the lines of [README.md](README.md), and
   `description` in `package.json`.
 - `MIN_EXECUTED` in `ci.yml` is the gate's floor, the fewest tests the gate must run (the gate is
-  the e2e suite in agentage/e2e). `25` fits all seven parts. With fewer parts the gate runs fewer
+  the e2e suite in agentage/e2e). `25` fits all eight parts. With fewer parts the gate runs fewer
   tests, so lower it, or the job is red.
 
 ## 3. Write parts

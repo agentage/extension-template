@@ -7,7 +7,7 @@ a web page, a widget, an API, MCP tools, a job or CLI commands to agentage.
 You need Node 22 or newer, npm 10 or newer, Docker and git. Nothing needs a sign-in.
 
 ```bash
-npx @agentage/cli@latest extension create <id> [part...]   # no part = all seven
+npx @agentage/cli@latest extension create <id> [part...]   # no part = all eight
 ```
 
 The parts are `pages`, `ui`, `api`, `mcp`, `worker`, `cli`, `app` and `store` (postgres). `create` keeps
