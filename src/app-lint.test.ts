@@ -6,7 +6,8 @@ const eslint = new ESLint();
 const lint = async (code: string, filePath: string) => {
   const [result] = await eslint.lintText(code, { filePath });
   const ids = result?.messages.map((m) => m.ruleId ?? m.message.slice(0, 200)) ?? [];
-  return ids.length ? ids : [JSON.stringify(result).slice(0, 600)];
+  if (!ids.length) throw new Error(JSON.stringify(result).slice(0, 400));
+  return ids;
 };
 
 vi.setConfig({ testTimeout: 30_000 });
