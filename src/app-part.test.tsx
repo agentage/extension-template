@@ -13,27 +13,33 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
+const mount = async (reply: (c: { path: string }) => unknown) => {
+  const record = createTestRecord();
+  const el = document.body.appendChild(document.createElement('div'));
+  root = createRoot(el);
+  await act(async () =>
+    root?.render(
+      <TestHost id="template" user={null} scopes={[]} record={record} reply={reply}>
+        <App />
+      </TestHost>
+    )
+  );
+  const echo = [...el.querySelectorAll('button')].find((b) => b.textContent === 'Echo');
+  await act(async () => echo?.click());
+  return { record, el };
+};
+
 describe('the app part', () => {
   it('Echo calls the own api with the message and shows the answer', async () => {
-    const record = createTestRecord();
-    const el = document.body.appendChild(document.createElement('div'));
-    root = createRoot(el);
-    await act(async () =>
-      root?.render(
-        <TestHost
-          id="template"
-          user={null}
-          scopes={[]}
-          record={record}
-          reply={() => ({ msg: 'hi' })}
-        >
-          <App />
-        </TestHost>
-      )
-    );
-    const echo = [...el.querySelectorAll('button')].find((b) => b.textContent === 'Echo');
-    await act(async () => echo?.click());
+    const { record, el } = await mount(() => ({ msg: 'hi' }));
     expect(record.calls[0]).toMatchObject({ id: 'template', path: '/echo?msg=hi' });
     expect(el.textContent).toContain('"msg":"hi"');
+  });
+
+  it('a refused call shows its error code and does not reject', async () => {
+    const { el } = await mount(() => {
+      throw Object.assign(new Error('no'), { code: 'FORBIDDEN' });
+    });
+    expect(el.querySelector('p')?.textContent).toBe('FORBIDDEN');
   });
 });

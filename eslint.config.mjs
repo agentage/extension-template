@@ -6,6 +6,8 @@ import playwrightPlugin from 'eslint-plugin-playwright';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
 
+const FETCH = 'Use useAppHost().api: the shell owns auth and the id.';
+
 export default [
   {
     ignores: ['dist/**', 'coverage/**', 'test-results/**'],
@@ -63,9 +65,14 @@ export default [
   {
     files: ['src/app/**/*.tsx'],
     rules: {
-      'no-restricted-globals': [
+      'no-restricted-globals': ['error', { name: 'fetch', message: FETCH }],
+      'no-restricted-properties': [
         'error',
-        { name: 'fetch', message: 'Use useAppHost().api: the shell owns auth and the id.' },
+        ...['window', 'globalThis', 'self'].map((object) => ({
+          object,
+          property: 'fetch',
+          message: FETCH,
+        })),
       ],
     },
   },
