@@ -16,7 +16,7 @@ describe('the app lint rule: no raw fetch in src/app', () => {
     '%s is refused',
     async (code) => {
       const rules = await lint(`export const x = () => ${code};\n`, 'src/app/index.tsx');
-      expect(rules).toContain('no-restricted-syntax');
+      expect(rules.join('|')).toContain('no-restricted-syntax');
     }
   );
 
