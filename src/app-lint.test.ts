@@ -1,16 +1,20 @@
 import { ESLint } from 'eslint';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 const eslint = new ESLint();
 
 const lint = async (code: string, filePath: string) => {
   const [result] = await eslint.lintText(code, { filePath });
   const ids = result?.messages.map((m) => m.ruleId ?? m.message.slice(0, 200)) ?? [];
-  if (!ids.length) throw new Error(JSON.stringify(result).slice(0, 400));
   return ids;
 };
 
-vi.setConfig({ testTimeout: 30_000 });
+vi.setConfig({ testTimeout: 30_000, hookTimeout: 60_000 });
+
+// The first typed lint of a process is cold: warm it before the cases.
+beforeAll(async () => {
+  await lint('export const warm = 1;\n', 'src/app/index.tsx');
+});
 
 describe('the app lint rule: no raw fetch in src/app', () => {
   it.each(["fetch('/x')", "window.fetch('/x')", "globalThis.fetch('/x')"])(
