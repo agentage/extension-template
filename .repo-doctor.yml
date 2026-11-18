@@ -10,4 +10,4 @@ waive:
   - id: be-migrations-ci
     reason: 'an extension never migrates from its own repo: the kit migrate job applies migrations/ in the local job (up) and in estate apply before each rollout; unit tests apply them to an in-process postgres'
   - id: cicd-release-artifact
-    reason: 'release.yml publishes through `agentage extension release` (images and a release record), not a literal npm publish command; the package is private and nothing goes to npm'
+    reason: 'release.yml publishes through `agentage extension release` (images, a release record and the npm publish via OIDC), not a literal npm publish command'
