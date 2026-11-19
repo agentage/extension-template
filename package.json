@@ -17,7 +17,7 @@
   },
   "engines": {
     "node": ">=22",
-    "agentage": "^0.18.1"
+    "agentage": "^0.20"
   },
   "agentage": {
     "id": "template",
@@ -74,12 +74,12 @@
     "prepublishOnly": "npm run verify"
   },
   "dependencies": {
-    "@agentage/extension": "^0.18.8",
+    "@agentage/extension": "^0.20.0",
     "express": "^5.1.0",
     "zod": "^4.2.0"
   },
   "devDependencies": {
-    "@agentage/cli": "^0.64.1",
+    "@agentage/cli": "^0.66.0",
     "@agentage/design-system": "0.20.1",
     "@agentage/widget": "^0.3.0",
     "@axe-core/playwright": "4.14.0",
